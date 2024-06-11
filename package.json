@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "ex:spotify": "tsc examples/spotify"
+    "ex:spotify": "ts-node examples/spotify.ts"
   },
   "keywords": [],
   "author": "",

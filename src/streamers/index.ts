@@ -1,12 +1,14 @@
-interface StreamingProvider {
-  authenticate(): boolean;
+export interface Streamer {
+  authenticate(): boolean
   fetchCurrentlyPlaying(): Promise<CurrentlyPlaying>
 }
 
-interface CurrentlyPlaying {
+export interface CurrentlyPlaying {
   title: string;
   artiste: string;
   imageUrl: string;
   genre: string;
   isPlaying: boolean;
 }
+
+export { SpotifyStreamer } from './spotify.streamer'

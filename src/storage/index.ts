@@ -4,3 +4,5 @@ export interface IStorer {
   delete(key: string): boolean
   has(key: string): boolean
 }
+
+export { InMemoryStorage } from './inmemory.storage'

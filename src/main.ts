@@ -3,15 +3,17 @@ import {
   type StorageKind,
   StorageKinds,
   providerSchema,
-  storageKindSchema
+  storageKindSchema,
+  Providers,
 } from './schema'
-import type { IStorer } from './storage/base'
-import { InMemoryStorage } from './storage/inmemory.storage'
+import { InMemoryStorage, type IStorer } from './storage'
+import { SpotifyStreamer, Streamer } from './streamers'
 
 export class NowPlaying {
   private storer: IStorer
   private provider: Provider
   private storageKind: StorageKind
+  private streamer: Streamer
 
   constructor(
     provider: Provider,
@@ -26,6 +28,7 @@ export class NowPlaying {
 
     // this is whatever storage mechanic the user selects
     this.storer = this.getStorer(storageKind)
+    this.streamer = this.getStreamer()
   }
 
   private getStorer(storageKind: StorageKind): IStorer {
@@ -36,4 +39,15 @@ export class NowPlaying {
         throw new Error('unsupported storage kind')
     }
   }
+
+  private getStreamer(): Streamer {
+    switch (this.provider) {
+      case Providers.SPOTIFY:
+        return new SpotifyStreamer()
+      default:
+        throw new Error('unsupported provider')
+    }
+  }
+
+  // private
 }

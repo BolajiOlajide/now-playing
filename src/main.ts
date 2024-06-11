@@ -1,22 +1,12 @@
-import { z } from 'zod'
-
+import {
+  type Provider,
+  type StorageKind,
+  StorageKinds,
+  providerSchema,
+  storageKindSchema
+} from './schema'
 import type { IStorer } from './storage/base'
 import { InMemoryStorage } from './storage/inmemory'
-
-export const Providers = {
-  SPOTIFY: 'SPOTIFY',
-} as const
-
-const providerSchema = z.nativeEnum(Providers)
-type Provider = z.infer<typeof providerSchema>
-
-export const StorageKinds = {
-  INMEMORY: 'INMEMORY',
-  SQLITE: 'SQLITE',
-} as const
-
-const storageKindSchema = z.nativeEnum(StorageKinds)
-type StorageKind = z.infer<typeof storageKindSchema>
 
 export class NowPlaying {
   private storer: IStorer

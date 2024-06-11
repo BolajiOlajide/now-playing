@@ -6,7 +6,7 @@ import {
   storageKindSchema
 } from './schema'
 import type { IStorer } from './storage/base'
-import { InMemoryStorage } from './storage/inmemory'
+import { InMemoryStorage } from './storage/inmemory.storage'
 
 export class NowPlaying {
   private storer: IStorer

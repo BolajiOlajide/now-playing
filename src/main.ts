@@ -3,31 +3,34 @@ import {
   type StorageKind,
   StorageKinds,
   providerSchema,
-  storageKindSchema,
   Providers,
+  type NowPlayingArgs,
+  NowPlayingArgsSchema,
 } from './schema'
 import { InMemoryStorage, type IStorer } from './storage'
-import { SpotifyStreamer, Streamer } from './streamers'
+import { SpotifyStreamer, type IStreamer } from './streamers'
 
+// NowPlaying allows one to get the currently playing song for a streaming platform
+// user. I
 export class NowPlaying {
   private storer: IStorer
   private provider: Provider
   private storageKind: StorageKind
-  private streamer: Streamer
+  private streamer: IStreamer
 
   constructor(
     provider: Provider,
-    storageKind: StorageKind = StorageKinds.INMEMORY,
+    args: NowPlayingArgs
   ) {
     // use zod to guarantee we get the right variable kind in here
     providerSchema.parse(provider)
-    storageKindSchema.parse(storageKind)
+    NowPlayingArgsSchema.parse(args)
 
     this.provider = provider
-    this.storageKind = storageKind
+    this.storageKind = args.storageKind
 
     // this is whatever storage mechanic the user selects
-    this.storer = this.getStorer(storageKind)
+    this.storer = this.getStorer(this.storageKind)
     this.streamer = this.getStreamer()
   }
 
@@ -40,7 +43,7 @@ export class NowPlaying {
     }
   }
 
-  private getStreamer(): Streamer {
+  private getStreamer(): IStreamer {
     switch (this.provider) {
       case Providers.SPOTIFY:
         return new SpotifyStreamer()

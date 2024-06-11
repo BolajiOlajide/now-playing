@@ -29,3 +29,8 @@ export const StorageKinds = {
 
 export const storageKindSchema = z.nativeEnum(StorageKinds)
 export type StorageKind = z.infer<typeof storageKindSchema>
+
+export const NowPlayingArgsSchema = z.object({
+  storageKind: storageKindSchema,
+})
+export type NowPlayingArgs = z.infer<typeof NowPlayingArgsSchema>

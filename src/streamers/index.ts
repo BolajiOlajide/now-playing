@@ -1,4 +1,4 @@
-export interface Streamer {
+export interface IStreamer {
   authenticate(): boolean
   fetchCurrentlyPlaying(): Promise<CurrentlyPlaying>
 }

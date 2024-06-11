@@ -33,7 +33,7 @@ export class NowPlaying {
       case StorageKinds.INMEMORY:
         return new InMemoryStorage()
       default:
-        throw new Error('Unknown storage kind')
+        throw new Error('unsupported storage kind')
     }
   }
 }

@@ -1,4 +1,4 @@
-import type { CurrentlyPlaying } from '.'
+import type { CurrentlyPlaying } from './types'
 
 export class SpotifyStreamer {
   public authenticate(): boolean {

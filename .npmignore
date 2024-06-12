@@ -1,0 +1,12 @@
+.editorconfig
+node_modules
+.circleci
+coverage
+.env
+.DS_Store
+npm-debug.log
+examples
+images
+.eslintrc
+src/examples
+package

@@ -8,9 +8,13 @@ This library is built to be generic to work with multiple providers and storage 
 ## Usage
 
 ```ts
-import { NowPlaying, Providers, StorageKinds } from '@BolajiOlajide/now-playing'
+import {
+  NowPlaying,
+  Providers,
+  StorageKinds,
+} from "@BolajiOlajide/now-playing";
 
 const np = new NowPlaying(Providers.SPOTIFY, {
   storageKind: StorageKinds.INMEMORY,
-})
+});
 ```

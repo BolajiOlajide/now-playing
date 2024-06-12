@@ -1,2 +1,2 @@
 export { InMemoryStorage } from './inmemory.storage'
-export { IStorer } from './types'
+export type { IStorer } from './types'

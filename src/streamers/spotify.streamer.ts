@@ -9,16 +9,23 @@ type SpotifyAccessToken = {
   created_at: number;
 }
 
+type SpotifyTrack = {
+  name: string;
+  artists: Array<{ name: string }>;
+  external_urls: { spotify: string };
+  album: { images: Array<{ url: string }> };
+  preview_url: string;
+}
+
 type SpotifyCurrrentlyPlayingResponse = {
   is_playing: boolean;
   currently_playing_type: string;
-  item: {
-    name: string;
-    artists: Array<{ name: string }>;
-    external_urls: { spotify: string };
-    album: { images: Array<{ url: string }> };
-    preview_url: string;
-  }
+  item: SpotifyTrack
+}
+
+type SpotifyRecentlyPlayedResponse = {
+  total: number;
+  items: Array<{ track: SpotifyTrack }>
 }
 
 export class SpotifyStreamer implements IStreamer {
@@ -48,21 +55,20 @@ export class SpotifyStreamer implements IStreamer {
     return jsonData
   }
 
-  async fetchCurrentlyPlaying(): Promise<Song> {
+  async fetchCurrentlyPlaying(): Promise<Song | null> {
     const accessToken = await this.getAccessToken(this.refreshToken)
 
     const headers = { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json', Accept: 'application/json' };
     const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { method: 'GET', headers });
+
+    if (!response.ok) {
+      return null
+    }
+
     const jsonData = await response.json() as SpotifyCurrrentlyPlayingResponse;
 
     if (!jsonData.is_playing || jsonData.currently_playing_type!== 'track') {
-      // return {
-      //   title: 'The title',
-      //   artiste: 'The artist',
-      //   image_url: 'https://the.image.url',
-      //   genre: 'The genre',
-      //   is_playing: false,
-      // }
+      return this.fetchLastPlayed(accessToken)
     }
 
     const track = jsonData.item
@@ -73,6 +79,26 @@ export class SpotifyStreamer implements IStreamer {
       image_url: track.album.images[0].url,
       preview_url: track.preview_url,
       url: track.external_urls.spotify,
+    }
+  }
+
+  private async fetchLastPlayed(accessToken: SpotifyAccessToken): Promise<Song | null> {
+    const headers = { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json', Accept: 'application/json' };
+    const response = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', { method: 'GET', headers });
+    const jsonData = await response.json() as SpotifyRecentlyPlayedResponse;
+
+    if (jsonData.items.length === 0) {
+      return null
+    }
+
+    const [{ track: lastPlayedTrack }] = jsonData.items
+    return {
+      is_playing: false,
+      title: lastPlayedTrack.name,
+      artiste: lastPlayedTrack.artists.map(artist => artist.name).join(', '),
+      image_url: lastPlayedTrack.album.images[0].url,
+      preview_url: lastPlayedTrack.preview_url,
+      url: lastPlayedTrack.external_urls.spotify,
     }
   }
 }

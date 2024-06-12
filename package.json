@@ -1,12 +1,13 @@
 {
   "name": "@bolajiolajide/now-playing",
-  "version": "1.0.0",
+  "version": "0.27.0",
   "description": "",
   "main": "dist/now-playing.js",
   "types": "dist/now-playing.d.ts",
   "type": "module",
   "scripts": {
     "ex:spotify": "ts-node examples/spotify.ts",
+    "ex:noop": "ts-node examples/noop.ts",
     "build": "npx rimraf dist && rollup --config"
   },
   "files": [

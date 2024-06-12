@@ -1,6 +1,6 @@
 import type { CurrentlyPlaying, IStreamer } from './types'
 
-export class SpotifyStreamer implements IStreamer {
+export class NoopStreamer implements IStreamer {
   public authenticate(): boolean {
     return true
   }

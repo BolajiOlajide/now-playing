@@ -1,4 +1,6 @@
-export class InMemoryStorage {
+import type { IStorer } from './types';
+
+export class InMemoryStorage implements IStorer {
   private data: Map<string, unknown> = new Map();
 
   set<T>(key: string, value: T): void {

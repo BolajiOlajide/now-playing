@@ -45,10 +45,11 @@ export class SpotifyStreamer implements IStreamer {
     this.refreshToken = args.refreshToken
   }
 
-  public async getAccessToken(refreshToken: string): Promise<SpotifyAccessToken> {
+  public async getAccessToken(refreshToken: string, forceRefresh: boolean=false): Promise<SpotifyAccessToken> {
     const existingAccessToken = this.storer.get<SpotifyAccessToken>(SPOTIFY_ACCESS_TOKEN_KEY)
-    if (existingAccessToken && (existingAccessToken.created_at + existingAccessToken.expires_in > Date.now())) {
-      return existingAccessToken
+
+    if (!forceRefresh && existingAccessToken && (existingAccessToken.created_at + existingAccessToken.expires_in > Date.now())) {
+      return existingAccessToken;
     }
 
     const tempToken = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
@@ -66,13 +67,19 @@ export class SpotifyStreamer implements IStreamer {
   }
 
   async fetchCurrentlyPlaying(): Promise<Song | null> {
-    const accessToken = await this.getAccessToken(this.refreshToken)
+    let accessToken = await this.getAccessToken(this.refreshToken)
 
     const headers = { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json', Accept: 'application/json' };
-    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { method: 'GET', headers });
+    let response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { method: 'GET', headers });
 
-    if (!response.ok) {
-      return null
+    if (response.status === 401) {
+      accessToken = await this.getAccessToken(this.refreshToken, true);
+      headers.Authorization = `Bearer ${accessToken.access_token}`;
+      response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { method: 'GET', headers });
+    }
+
+    if (response.status === 204 || !response.ok) {
+      return this.fetchLastPlayed(accessToken);
     }
 
     const jsonData = await response.json() as SpotifyCurrrentlyPlayingResponse;

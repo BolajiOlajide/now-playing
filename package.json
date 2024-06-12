@@ -1,5 +1,5 @@
 {
-  "name": "now-playing",
+  "name": "@bolajiolajide/now-playing",
   "version": "1.0.0",
   "description": "",
   "main": "dist/now-playing.js",

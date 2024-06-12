@@ -1,19 +1,78 @@
-import type { CurrentlyPlaying, IStreamer } from './types'
+import type { Song, IStreamer } from './types'
+import { SpotifyStreamerArgsSchema, type SpotifyStreamerArgs } from '../schema'
+
+type SpotifyAccessToken = {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+  created_at: number;
+}
+
+type SpotifyCurrrentlyPlayingResponse = {
+  is_playing: boolean;
+  currently_playing_type: string;
+  item: {
+    name: string;
+    artists: Array<{ name: string }>;
+    external_urls: { spotify: string };
+    album: { images: Array<{ url: string }> };
+    preview_url: string;
+  }
+}
 
 export class SpotifyStreamer implements IStreamer {
-  public authenticate(): boolean {
-    return true
+  private clientId: string
+  private clientSecret: string
+  private refreshToken: string
+
+  constructor(args: SpotifyStreamerArgs) {
+    SpotifyStreamerArgsSchema.parse(args)
+
+    this.clientId = args.clientId
+    this.clientSecret = args.clientSecret
+    this.refreshToken = args.refreshToken
   }
 
-  fetchCurrentlyPlaying(): Promise<CurrentlyPlaying> {
-    return new Promise((resolve) => {
-      resolve({
-        title: 'The title',
-        artiste: 'The artist',
-        imageUrl: 'https://the.image.url',
-        genre: 'The genre',
-        isPlaying: true,
-      })
-    })
+  public async getAccessToken(refreshToken: string): Promise<SpotifyAccessToken> {
+    const tempToken = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
+    const headers = { Authorization: `Basic ${tempToken}`, 'Content-Type': 'application/x-www-form-urlencoded' };
+
+    const params = new URLSearchParams();
+    params.append('grant_type', 'refresh_token');
+    params.append('refresh_token', refreshToken);
+
+    const response = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers, body: params });
+    const jsonData = await response.json() as SpotifyAccessToken;
+    jsonData.created_at = Date.now()
+    return jsonData
+  }
+
+  async fetchCurrentlyPlaying(): Promise<Song> {
+    const accessToken = await this.getAccessToken(this.refreshToken)
+
+    const headers = { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json', Accept: 'application/json' };
+    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { method: 'GET', headers });
+    const jsonData = await response.json() as SpotifyCurrrentlyPlayingResponse;
+
+    if (!jsonData.is_playing || jsonData.currently_playing_type!== 'track') {
+      // return {
+      //   title: 'The title',
+      //   artiste: 'The artist',
+      //   image_url: 'https://the.image.url',
+      //   genre: 'The genre',
+      //   is_playing: false,
+      // }
+    }
+
+    const track = jsonData.item
+    return {
+      is_playing: jsonData.is_playing,
+      title: track.name,
+      artiste: track.artists.map(artist => artist.name).join(', '),
+      image_url: track.album.images[0].url,
+      preview_url: track.preview_url,
+      url: track.external_urls.spotify,
+    }
   }
 }

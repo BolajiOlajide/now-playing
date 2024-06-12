@@ -10,9 +10,9 @@ export class NoopStreamer implements IStreamer {
       resolve({
         title: 'The title',
         artiste: 'The artist',
-        imageUrl: 'https://the.image.url',
+        image_url: 'https://the.image.url',
         genre: 'The genre',
-        isPlaying: true,
+        is_playing: true,
       })
     })
   }

@@ -1,12 +1,12 @@
 export interface IStreamer {
-  authenticate(): boolean
-  fetchCurrentlyPlaying(): Promise<CurrentlyPlaying>
+  fetchCurrentlyPlaying(): Promise<Song>
 }
 
-export interface CurrentlyPlaying {
+export interface Song {
   title: string;
   artiste: string;
-  imageUrl: string;
-  genre: string;
-  isPlaying: boolean;
+  image_url: string;
+  is_playing: boolean;
+  preview_url: string;
+  url: string;
 }

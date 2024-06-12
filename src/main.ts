@@ -8,6 +8,7 @@ import {
   type SpotifyProviderArgs,
   SpotifyProviderArgsSchema,
   NoopProviderArgsSchema,
+  SpotifyStreamerArgs,
 } from './schema'
 import { InMemoryStorage, type IStorer } from './storage'
 import { SpotifyStreamer, NoopStreamer, type IStreamer } from './streamers'
@@ -19,6 +20,7 @@ export class NowPlaying {
   private storageKind: StorageKind
   private storer: IStorer
   private streamer: IStreamer
+  private streamerArgs: SpotifyProviderArgs['streamerArgs'] | NoopProviderArgs['streamerArgs']
 
   constructor(provider: "NOOP", args: NoopProviderArgs)
   constructor(provider: "SPOTIFY", args: SpotifyProviderArgs)
@@ -36,6 +38,7 @@ export class NowPlaying {
     // this is whatever storage mechanic the user selects
     this.storer = this.getStorer(this.storageKind)
     this.streamer = this.getStreamer()
+    this.streamerArgs = args.streamerArgs
   }
 
   private parseArgs(args: unknown): void {
@@ -63,7 +66,7 @@ export class NowPlaying {
   private getStreamer(): IStreamer {
     switch (this.provider) {
       case Providers.SPOTIFY:
-        return new SpotifyStreamer()
+        return new SpotifyStreamer({ ...this.streamerArgs as SpotifyStreamerArgs })
       case Providers.NOOP:
         return new NoopStreamer()
       default:

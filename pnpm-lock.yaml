@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@types/node':
+    specifier: ^20.14.2
+    version: 20.14.2
   zod:
     specifier: 3.23.8
     version: 3.23.8
@@ -20,10 +23,14 @@ devDependencies:
     version: 6.1.1(rollup@4.18.0)(typescript@5.4.5)
   ts-node:
     specifier: 10.9.2
+<<<<<<< HEAD
     version: 10.9.2(@types/node@18.19.34)(typescript@5.4.5)
   tslib:
     specifier: ^2.6.3
     version: 2.6.3
+=======
+    version: 10.9.2(@types/node@20.14.2)(typescript@5.4.5)
+>>>>>>> d3b1e7f (first half of spotify thing)
   typescript:
     specifier: 5.4.5
     version: 5.4.5
@@ -267,7 +274,6 @@ packages:
     resolution: {integrity: sha512-eXF4pfBNV5DAMKGbI02NnDtWrQ40hAN558/2vvS4gMpMIxaf6JmD7YjnZbq0Q9TDSSkKBamime8ewRoomHdt4g==}
     dependencies:
       undici-types: 5.26.5
-    dev: true
 
   /acorn-walk@8.3.2:
     resolution: {integrity: sha512-cjkyv4OtNCIeqhHrfS81QWXoCBPExR/J62oyEqepVw8WaQeSqpW2uhuLPh1m9eWhDuOo/jUXVTlifvesOWp/4A==}
@@ -498,7 +504,6 @@ packages:
 
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
-    dev: true
 
   /v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}

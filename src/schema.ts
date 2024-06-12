@@ -22,7 +22,7 @@ export const BaseNowPlayingArgsSchema = z.object({
 })
 export type BaseNowPlayingArgs = z.infer<typeof BaseNowPlayingArgsSchema>
 
-export const SpotifyProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
+export const SpotifyStreamerArgsSchema = z.object({
   clientId: z.string({
     message: 'Spotify client ID (clientId) is required',
     required_error: 'Spotify client ID (clientId) is required',
@@ -36,8 +36,15 @@ export const SpotifyProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
     required_error: 'Spotify refresh token (refreshToken) is required',
   }),
 })
+export type SpotifyStreamerArgs = z.infer<typeof SpotifyStreamerArgsSchema>
+
+export const SpotifyProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
+  streamerArgs: SpotifyStreamerArgsSchema,
+})
 export type SpotifyProviderArgs = z.infer<typeof SpotifyProviderArgsSchema>
 
-export const NoopProviderArgsSchema = BaseNowPlayingArgsSchema.extend({})
+export const NoopProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
+  streamerArgs: z.object({}).nullable().optional(),
+})
 export type NoopProviderArgs = z.infer<typeof NoopProviderArgsSchema>
 

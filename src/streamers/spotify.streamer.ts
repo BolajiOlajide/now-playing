@@ -1,7 +1,9 @@
 import type { Song, IStreamer } from './types'
 import { SpotifyStreamerArgsSchema, type SpotifyStreamerArgs } from '../schema'
+import type { IStorer } from '../storage'
+import { SPOTIFY_ACCESS_TOKEN_KEY } from '../constants'
 
-type SpotifyAccessToken = {
+interface SpotifyAccessToken {
   access_token: string;
   token_type: string;
   expires_in: number;
@@ -32,8 +34,10 @@ export class SpotifyStreamer implements IStreamer {
   private clientId: string
   private clientSecret: string
   private refreshToken: string
+  private storer: IStorer
 
-  constructor(args: SpotifyStreamerArgs) {
+  constructor(storer: IStorer, args: SpotifyStreamerArgs) {
+    this.storer = storer
     SpotifyStreamerArgsSchema.parse(args)
 
     this.clientId = args.clientId
@@ -42,6 +46,11 @@ export class SpotifyStreamer implements IStreamer {
   }
 
   public async getAccessToken(refreshToken: string): Promise<SpotifyAccessToken> {
+    const existingAccessToken = this.storer.get<SpotifyAccessToken>(SPOTIFY_ACCESS_TOKEN_KEY)
+    if (existingAccessToken && (existingAccessToken.created_at + existingAccessToken.expires_in > Date.now())) {
+      return existingAccessToken
+    }
+
     const tempToken = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
     const headers = { Authorization: `Basic ${tempToken}`, 'Content-Type': 'application/x-www-form-urlencoded' };
 
@@ -52,6 +61,7 @@ export class SpotifyStreamer implements IStreamer {
     const response = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers, body: params });
     const jsonData = await response.json() as SpotifyAccessToken;
     jsonData.created_at = Date.now()
+    this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData)
     return jsonData
   }
 

@@ -11,7 +11,7 @@ import {
   SpotifyStreamerArgs,
 } from './schema'
 import { InMemoryStorage, type IStorer } from './storage'
-import { SpotifyStreamer, NoopStreamer, type IStreamer } from './streamers'
+import { SpotifyStreamer, NoopStreamer, type IStreamer, Song } from './streamers'
 
 // NowPlaying allows one to get the currently playing song for a streaming platform
 // user. I
@@ -66,7 +66,7 @@ export class NowPlaying {
   private getStreamer(): IStreamer {
     switch (this.provider) {
       case Providers.SPOTIFY:
-        return new SpotifyStreamer({ ...this.streamerArgs as SpotifyStreamerArgs })
+        return new SpotifyStreamer(this.storer, { ...this.streamerArgs as SpotifyStreamerArgs })
       case Providers.NOOP:
         return new NoopStreamer()
       default:
@@ -74,5 +74,7 @@ export class NowPlaying {
     }
   }
 
-  // private
+  fetchCurrentlyPlayingOrLastPlayed(): Promise<Song | null> {
+    return this.streamer.fetchCurrentlyPlaying()
+  }
 }

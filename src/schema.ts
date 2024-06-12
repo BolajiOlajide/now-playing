@@ -11,14 +11,14 @@ export type Provider = z.infer<typeof providerSchema>
 
 export const StorageKinds = {
   INMEMORY: 'INMEMORY',
-  SQLITE: 'SQLITE',
+  // SQLITE: 'SQLITE',
 } as const
 
 export const storageKindSchema = z.nativeEnum(StorageKinds)
 export type StorageKind = z.infer<typeof storageKindSchema>
 
 export const BaseNowPlayingArgsSchema = z.object({
-  storageKind: storageKindSchema,
+  storageKind: storageKindSchema.optional().default(StorageKinds.INMEMORY),
 })
 export type BaseNowPlayingArgs = z.infer<typeof BaseNowPlayingArgsSchema>
 
@@ -44,7 +44,7 @@ export const SpotifyProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
 export type SpotifyProviderArgs = z.infer<typeof SpotifyProviderArgsSchema>
 
 export const NoopProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
-  streamerArgs: z.object({}).nullable().optional(),
+  streamerArgs: z.unknown().nullable().optional(),
 })
 export type NoopProviderArgs = z.infer<typeof NoopProviderArgsSchema>
 

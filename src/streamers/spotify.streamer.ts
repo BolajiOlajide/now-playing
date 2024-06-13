@@ -77,7 +77,7 @@ export class SpotifyStreamer implements IStreamer {
     let accessToken = await this.getAccessToken(this.refreshToken);
 
     const headers = { Authorization: `Bearer ${accessToken.access_token}`, 'Content-Type': 'application/json', Accept: 'application/json' };
-    let response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { method: 'GET', headers });
+    let response: Response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { method: 'GET', headers });
 
     if (response.status === 401) {
       accessToken = await this.getAccessToken(this.refreshToken, true);
@@ -112,7 +112,7 @@ export class SpotifyStreamer implements IStreamer {
 
   private async fetchLastPlayed(accessToken: SpotifyAccessToken, useCache: boolean, cacheDuration: number): Promise<Song | null> {
     const headers = { Authorization: `Bearer ${accessToken.access_token}`, 'Content-Type': 'application/json', Accept: 'application/json' };
-    const response = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', { method: 'GET', headers });
+    const response: Response = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', { method: 'GET', headers });
     const jsonData = await response.json() as SpotifyRecentlyPlayedResponse;
 
     if (jsonData.items.length === 0) {

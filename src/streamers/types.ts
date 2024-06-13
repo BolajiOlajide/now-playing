@@ -1,5 +1,8 @@
 export interface IStreamer {
-  fetchCurrentlyPlaying(): Promise<Song | null>
+  fetchCurrentlyPlaying(
+    cacheSong: boolean,
+    cacheDuration: number
+  ): Promise<Song | null>;
 }
 
 export interface Song {

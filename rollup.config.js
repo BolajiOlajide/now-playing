@@ -9,7 +9,7 @@ const config = [
       format: "cjs",
       sourcemap: true,
     },
-    external: ["zod"],
+    external: ["zod", "node-fetch"],
     plugins: [typescript()],
   },
   {

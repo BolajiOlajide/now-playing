@@ -1,3 +1,5 @@
+import fetch, { Response } from 'node-fetch';
+
 import type { Song, IStreamer } from './types';
 import { SpotifyStreamerArgsSchema, type SpotifyStreamerArgs } from '../schema';
 import type { IStorer } from '../storage';
@@ -59,7 +61,7 @@ export class SpotifyStreamer implements IStreamer {
     params.append('grant_type', 'refresh_token');
     params.append('refresh_token', refreshToken);
 
-    const response = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers, body: params });
+    const response: Response = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers, body: params });
     const jsonData = await response.json() as SpotifyAccessToken;
     this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData);
     return jsonData;

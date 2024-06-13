@@ -19,6 +19,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node-fetch": "^2.6.11",
+    "node-fetch": "^3.3.2",
     "zod": "3.23.8"
   },
   "devDependencies": {

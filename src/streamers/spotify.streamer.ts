@@ -62,7 +62,7 @@ export class SpotifyStreamer implements IStreamer {
     const response = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers, body: params });
     const jsonData = await response.json() as SpotifyAccessToken;
     jsonData.created_at = Date.now()
-    this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData)
+    this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData, jsonData.expires_in * 1000);
     return jsonData
   }
 

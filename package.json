@@ -1,6 +1,6 @@
 {
   "name": "@bolajiolajide/now-playing",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/now-playing.js",
   "types": "dist/now-playing.d.ts",

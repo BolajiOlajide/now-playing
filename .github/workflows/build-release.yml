@@ -7,13 +7,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          cache: "pnpm"
+          node-version-file: ".nvmrc"
           registry-url: "https://npm.pkg.github.com/"
           scope: "@bolajiolajide"
-      - run: pnpm install
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - run: pnpm run build
-      - run: pnpm publish --provenance --access public
+      - name: Publish 🚀
+        shell: bash
+        run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}

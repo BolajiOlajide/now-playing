@@ -18,7 +18,7 @@ import { SpotifyStreamer, NoopStreamer, type IStreamer, Song } from './streamers
 export class NowPlaying {
   private provider: Provider
   private storageKind: StorageKind
-  private cacheSong: boolean
+  private useCache: boolean
   private cacheDuration: number
   private storer: IStorer
   private streamer: IStreamer
@@ -36,7 +36,7 @@ export class NowPlaying {
 
     this.parseArgs(args)
     this.storageKind = args.storageKind
-    this.cacheSong = args.cacheSong
+    this.useCache = args.useCache
     this.cacheDuration = args.cacheDuration || 60000;
 
     // this is whatever storage mechanic the user selects
@@ -79,6 +79,6 @@ export class NowPlaying {
   }
 
   fetchCurrentlyPlayingOrLastPlayed(): Promise<Song | null> {
-    return this.streamer.fetchCurrentlyPlaying(this.cacheSong, this.cacheDuration)
+    return this.streamer.fetchCurrentlyPlaying(this.useCache, this.cacheDuration)
   }
 }

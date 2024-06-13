@@ -19,7 +19,7 @@ export type StorageKind = z.infer<typeof storageKindSchema>;
 
 export const BaseNowPlayingArgsSchema = z.object({
   storageKind: storageKindSchema.optional().default(StorageKinds.INMEMORY),
-  cacheSong: z.boolean().optional().default(true),
+  useCache: z.boolean().optional().default(true),
   cacheDuration: z
     .number()
     .optional()

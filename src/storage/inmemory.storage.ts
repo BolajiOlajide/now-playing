@@ -1,9 +1,4 @@
-import type { IStorer } from "./types";
-
-interface DataEntry<T> {
-  value: T;
-  expiresAt: number;
-}
+import type { IStorer, DataEntry } from "./types";
 
 export class InMemoryStorage implements IStorer {
   private data: Map<string, DataEntry<unknown>> = new Map();

@@ -28,7 +28,7 @@ export class NowPlaying {
   constructor(provider: Providers.NOOP, args: NoopProviderArgs)
   constructor(provider: Providers.SPOTIFY, args: SpotifyProviderArgs)
   constructor(
-    provider: typeof Providers[keyof typeof Providers],
+    provider: Provider,
     args: SpotifyProviderArgs | NoopProviderArgs
   ) {
     // use zod to guarantee we get the right variable kind in here

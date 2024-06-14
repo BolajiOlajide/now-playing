@@ -18,3 +18,24 @@ const np = new NowPlaying(Providers.SPOTIFY, {
   storageKind: StorageKinds.INMEMORY,
 });
 ```
+
+
+### With Spotify
+```ts
+import {
+  NowPlaying,
+  Providers,
+  StorageKinds,
+} from "@BolajiOlajide/now-playing";
+
+const np = new NowPlaying(Providers.SPOTIFY, {
+  storageKind: StorageKinds.INMEMORY,
+  useCache: false, // default is true
+  cacheDuration: 30000, // in milliseconds
+  streamerArgs: {
+    clientId: "foo",
+    clientSecret: "bar",
+    refreshToken: "baz",
+  }
+});
+```

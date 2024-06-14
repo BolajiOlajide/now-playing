@@ -5,8 +5,18 @@ const config = [
   {
     input: "./src/index.ts",
     output: {
-      file: "dist/now-playing.js",
+      file: "dist/now-playing.cjs.js",
       format: "cjs",
+      sourcemap: true,
+    },
+    external: ["zod", "node-fetch"],
+    plugins: [typescript()],
+  },
+  {
+    input: "./src/index.ts",
+    output: {
+      file: "dist/now-playing.esm.js",
+      format: "es",
       sourcemap: true,
     },
     external: ["zod", "node-fetch"],

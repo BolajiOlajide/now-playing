@@ -22,17 +22,12 @@ jobs:
         with:
           cache: "pnpm"
           node-version-file: ".nvmrc"
-          registry-url: "https://npm.pkg.github.com/"
+          registry-url: https://registry.npmjs.org
           scope: "@bolajiolajide"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - run: pnpm run build
-      - run: |
-          echo "@username:registry=https://npm.pkg.github.com" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_ACCESS_TOKEN }}" >> .npmrc
-      - name: Publish 🚀
-        shell: bash
-        run: pnpm publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+      - uses: simenandre/publish-with-pnpm@v1
+        with:
+          npm-auth-token: ${{ secrets.NPM_ACCESS_TOKEN }}

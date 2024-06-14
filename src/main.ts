@@ -9,6 +9,7 @@ import {
   SpotifyProviderArgsSchema,
   NoopProviderArgsSchema,
   SpotifyStreamerArgs,
+  storageKindSchema,
 } from './schema'
 import { InMemoryStorage, type IStorer } from './storage'
 import { SpotifyStreamer, NoopStreamer, type IStreamer, Song } from './streamers'
@@ -35,8 +36,8 @@ export class NowPlaying {
     this.provider = provider
 
     this.parseArgs(args)
-    this.storageKind = args.storageKind
-    this.useCache = args.useCache
+    this.storageKind = args.storageKind || StorageKinds.INMEMORY
+    this.useCache = args.useCache || true
     this.cacheDuration = args.cacheDuration || 60000;
 
     // this is whatever storage mechanic the user selects

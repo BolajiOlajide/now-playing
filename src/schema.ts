@@ -18,12 +18,11 @@ export const storageKindSchema = z.nativeEnum(StorageKinds);
 export type StorageKind = z.infer<typeof storageKindSchema>;
 
 export const BaseNowPlayingArgsSchema = z.object({
-  storageKind: storageKindSchema.optional().default(StorageKinds.INMEMORY),
-  useCache: z.boolean().optional().default(true),
+  storageKind: storageKindSchema.optional(),
+  useCache: z.boolean().optional(),
   cacheDuration: z
     .number()
     .optional()
-    .default(60 * 60 * 24),
 });
 export type BaseNowPlayingArgs = z.infer<typeof BaseNowPlayingArgsSchema>;
 

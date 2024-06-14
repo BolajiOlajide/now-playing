@@ -6,7 +6,7 @@ export enum Providers {
 }
 
 export const providerSchema = z.nativeEnum(Providers);
-export type Provider = z.infer<typeof providerSchema>;
+// export type Provider = z.infer<typeof providerSchema>;
 
 export const StorageKinds = {
   INMEMORY: "INMEMORY",

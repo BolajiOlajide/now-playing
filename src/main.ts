@@ -1,5 +1,5 @@
 import {
-  type Provider,
+  // type Provider,
   type StorageKind,
   StorageKinds,
   providerSchema,
@@ -9,7 +9,6 @@ import {
   SpotifyProviderArgsSchema,
   NoopProviderArgsSchema,
   SpotifyStreamerArgs,
-  storageKindSchema,
 } from './schema'
 import { InMemoryStorage, type IStorer } from './storage'
 import { SpotifyStreamer, NoopStreamer, type IStreamer, Song } from './streamers'
@@ -17,7 +16,7 @@ import { SpotifyStreamer, NoopStreamer, type IStreamer, Song } from './streamers
 // NowPlaying allows one to get the currently playing song for a streaming platform
 // user.
 export class NowPlaying {
-  private provider: Provider
+  private provider: Providers
   private storageKind: StorageKind
   private useCache: boolean
   private cacheDuration: number
@@ -25,10 +24,9 @@ export class NowPlaying {
   private streamer: IStreamer
   private streamerArgs: SpotifyProviderArgs['streamerArgs'] | unknown
 
-  constructor(provider: Providers.NOOP, args: NoopProviderArgs)
   constructor(provider: Providers.SPOTIFY, args: SpotifyProviderArgs)
   constructor(
-    provider: Provider,
+    provider: Providers,
     args: SpotifyProviderArgs | NoopProviderArgs
   ) {
     // use zod to guarantee we get the right variable kind in here

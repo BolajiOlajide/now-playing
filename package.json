@@ -1,9 +1,9 @@
 {
   "name": "@bolajiolajide/now-playing",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "",
-  "main": "dist/now-playing.cjs.js",
-  "module": "dist/now-playing.esm.js",
+  "main": "dist/now-playing.mjs",
+  "module": "dist/now-playing.mjs",
   "types": "dist/now-playing.d.ts",
   "type": "module",
   "scripts": {
@@ -11,19 +11,19 @@
     "build": "npx rimraf dist && rollup --config"
   },
   "exports": {
-    "require": "./dist/now-playing.cjs.js",
     "types": "./dist/now-playing.d.ts",
-    "default": "./dist/now-playing.esm.js"
+    "default": "./dist/now-playing.mjs"
   },
   "files": [
-    "dist"
+    "dist/now-playing.mjs",
+    "dist/now-playing.d.ts"
   ],
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node-fetch": "^2.6.11",
-    "node-fetch": "^3.3.2",
+    "@types/node-fetch": "2.6.11",
+    "node-fetch": "2.6.1",
     "zod": "3.23.8"
   },
   "devDependencies": {

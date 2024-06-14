@@ -1,10 +1,9 @@
 import * as z from "zod";
 
-export const Providers = {
-  SPOTIFY: "SPOTIFY",
-  // this is mostly used for testing
-  NOOP: "NOOP",
-} as const;
+export enum Providers {
+  SPOTIFY = 'SPOTIFY',
+  NOOP = 'NOOP',
+}
 
 export const providerSchema = z.nativeEnum(Providers);
 export type Provider = z.infer<typeof providerSchema>;
@@ -48,6 +47,6 @@ export const SpotifyProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
 export type SpotifyProviderArgs = z.infer<typeof SpotifyProviderArgsSchema>;
 
 export const NoopProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
-  streamerArgs: z.unknown().nullable().optional(),
+  streamerArgs: z.unknown(),
 });
 export type NoopProviderArgs = z.infer<typeof NoopProviderArgsSchema>;

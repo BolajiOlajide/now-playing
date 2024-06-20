@@ -47,6 +47,6 @@ export const SpotifyProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
 export type SpotifyProviderArgs = z.infer<typeof SpotifyProviderArgsSchema>;
 
 export const NoopProviderArgsSchema = BaseNowPlayingArgsSchema.extend({
-  streamerArgs: z.unknown(),
+  streamerArgs: z.never(),
 });
 export type NoopProviderArgs = z.infer<typeof NoopProviderArgsSchema>;

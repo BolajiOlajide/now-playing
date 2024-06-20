@@ -34,6 +34,7 @@ export class NowPlaying {
     this.provider = provider
 
     this.parseArgs(args)
+    this.streamerArgs = args.streamerArgs
     this.storageKind = args.storageKind || StorageKinds.INMEMORY
     this.useCache = args.useCache || true
     this.cacheDuration = args.cacheDuration || 60000;
@@ -41,7 +42,6 @@ export class NowPlaying {
     // this is whatever storage mechanic the user selects
     this.storer = this.getStorer(this.storageKind)
     this.streamer = this.getStreamer()
-    this.streamerArgs = args.streamerArgs
   }
 
   private parseArgs(args: unknown): void {

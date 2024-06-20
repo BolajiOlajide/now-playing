@@ -1,5 +1,5 @@
+import { CACHE_DURATION_MS } from './constants'
 import {
-  // type Provider,
   type StorageKind,
   StorageKinds,
   providerSchema,
@@ -37,7 +37,7 @@ export class NowPlaying {
     this.streamerArgs = args.streamerArgs
     this.storageKind = args.storageKind || StorageKinds.INMEMORY
     this.useCache = args.useCache || true
-    this.cacheDuration = args.cacheDuration || 60000;
+    this.cacheDuration = args.cacheDuration || CACHE_DURATION_MS;
 
     // this is whatever storage mechanic the user selects
     this.storer = this.getStorer(this.storageKind)

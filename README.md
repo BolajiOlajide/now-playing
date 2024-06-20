@@ -48,7 +48,8 @@ const np = new NowPlaying(Providers.SPOTIFY, {
 
 You need two things.
 
-1. Spotify Client ID and Secret
+1. Spotify Client ID 
+2. Spotify Client Secret
 2. Spotify Refresh Token
 
 To get your Spotify Client ID and sercet, follow these steps:

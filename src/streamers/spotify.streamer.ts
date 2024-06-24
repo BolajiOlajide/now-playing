@@ -67,7 +67,7 @@ export class SpotifyStreamer implements IStreamer {
     return jsonData;
   }
 
-  public async fetchCurrentlyPlaying(useCache: boolean = true, cacheDuration: number): Promise<Song | null> {
+  public async fetchCurrentlyPlaying(useCache: boolean, cacheDuration: number): Promise<Song | null> {
     if (useCache) {
       const cachedSong = this.storer.get<Song>(SPOTIFY_TRACK_KEY);
 

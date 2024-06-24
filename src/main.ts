@@ -37,15 +37,15 @@ export class NowPlaying {
       providerSchema.parse(provider)
       this.provider = provider
 
-    this.parseArgs(args)
-    this.streamerArgs = args.streamerArgs
-    this.storageKind = args.storageKind || StorageKinds.INMEMORY
-    this.useCache = args.useCache || true
-    this.cacheDuration = args.cacheDuration || CACHE_DURATION_MS;
+      this.parseArgs(args)
+      this.streamerArgs = args.streamerArgs
+      this.storageKind = args.storageKind || StorageKinds.INMEMORY
+      this.useCache = args.useCache || true
+      this.cacheDuration = args.cacheDuration || CACHE_DURATION_MS;
 
-    // this is whatever storage mechanic the user selects
-    this.storer = this.getStorer(this.storageKind)
-    this.streamer = this.getStreamer()
+      // this is whatever storage mechanic the user selects
+      this.storer = this.getStorer(this.storageKind)
+      this.streamer = this.getStreamer()
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         // We want to display Zod errors one at a time, so we stick

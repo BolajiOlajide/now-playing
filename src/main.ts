@@ -72,9 +72,10 @@ export class NowPlaying {
   }
 
   private getStreamer(): IStreamer {
+    const cacheOpts = { useCache: this.useCache, cacheDuration: this.cacheDuration }
     switch (this.provider) {
       case Providers.SPOTIFY:
-        return new SpotifyStreamer(this.storer, { ...this.streamerArgs as SpotifyStreamerArgs })
+        return new SpotifyStreamer(this.storer, { ...this.streamerArgs as SpotifyStreamerArgs, ...cacheOpts })
       case Providers.NOOP:
         return new NoopStreamer()
       default:
@@ -83,6 +84,6 @@ export class NowPlaying {
   }
 
   fetchCurrentlyPlayingOrLastPlayed(): Promise<Song | null> {
-    return this.streamer.fetchCurrentlyPlaying(this.useCache, this.cacheDuration)
+    return this.streamer.fetchCurrentlyPlaying()
   }
 }

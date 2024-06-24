@@ -2,8 +2,6 @@ import { ZodError } from 'zod'
 
 import { CACHE_DURATION_MS } from './constants'
 import {
-  type StorageKind,
-  StorageKinds,
   providerSchema,
   Providers,
   type NoopProviderArgs,
@@ -20,7 +18,6 @@ import { ValidationError } from './error'
 // user.
 export class NowPlaying {
   private provider: Providers
-  private storageKind: StorageKind
   private useCache: boolean
   private cacheDuration: number
   private storer: IStorer
@@ -39,12 +36,12 @@ export class NowPlaying {
 
       this.parseArgs(args)
       this.streamerArgs = args.streamerArgs
-      this.storageKind = args.storageKind || StorageKinds.INMEMORY
       this.useCache = args.useCache || true
       this.cacheDuration = args.cacheDuration || CACHE_DURATION_MS;
 
-      // this is whatever storage mechanic the user selects
-      this.storer = this.getStorer(this.storageKind)
+      // We only support in memory storage for now, if there's a need we can
+      // support more storage mechanism.
+      this.storer = this.getStorer()
       this.streamer = this.getStreamer()
     } catch (err: unknown) {
       if (err instanceof ZodError) {
@@ -70,19 +67,15 @@ export class NowPlaying {
     }
   }
 
-  private getStorer(storageKind: StorageKind): IStorer {
-    switch (storageKind) {
-      case StorageKinds.INMEMORY:
-        return new InMemoryStorage()
-      default:
-        throw new Error('unsupported storage kind')
-    }
+  private getStorer(): IStorer {
+    return new InMemoryStorage()
   }
 
   private getStreamer(): IStreamer {
+    const cacheOpts = { useCache: this.useCache, cacheDuration: this.cacheDuration }
     switch (this.provider) {
       case Providers.SPOTIFY:
-        return new SpotifyStreamer(this.storer, { ...this.streamerArgs as SpotifyStreamerArgs })
+        return new SpotifyStreamer(this.storer, { ...this.streamerArgs as SpotifyStreamerArgs, ...cacheOpts })
       case Providers.NOOP:
         return new NoopStreamer()
       default:
@@ -91,6 +84,6 @@ export class NowPlaying {
   }
 
   fetchCurrentlyPlayingOrLastPlayed(): Promise<Song | null> {
-    return this.streamer.fetchCurrentlyPlaying(this.useCache, this.cacheDuration)
+    return this.streamer.fetchCurrentlyPlaying()
   }
 }

@@ -1,6 +1,6 @@
 import fetch, { Response } from 'node-fetch';
 
-import type { Song, IStreamer } from './types';
+import type { Song, IStreamer, IStreamerCacheOpts } from './types';
 import { SpotifyStreamerArgsSchema, type SpotifyStreamerArgs } from '../schema';
 import type { IStorer } from '../storage';
 import { SPOTIFY_ACCESS_TOKEN_KEY, SPOTIFY_TRACK_KEY } from '../constants';
@@ -37,14 +37,18 @@ export class SpotifyStreamer implements IStreamer {
   private clientSecret: string;
   private refreshToken: string;
   private storer: IStorer;
+  private useCache: boolean;
+  private cacheDuration: number;
 
-  constructor(storer: IStorer, args: SpotifyStreamerArgs) {
+  constructor(storer: IStorer, args: SpotifyStreamerArgs & IStreamerCacheOpts) {
     this.storer = storer;
     SpotifyStreamerArgsSchema.parse(args);
 
     this.clientId = args.clientId;
     this.clientSecret = args.clientSecret;
     this.refreshToken = args.refreshToken;
+    this.useCache = args.useCache;
+    this.cacheDuration = args.cacheDuration;
   }
 
   public async getAccessToken(refreshToken: string, forceRefresh: boolean = false): Promise<SpotifyAccessToken> {
@@ -63,12 +67,12 @@ export class SpotifyStreamer implements IStreamer {
 
     const response: Response = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers, body: params });
     const jsonData = await response.json() as SpotifyAccessToken;
-    this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData);
+    this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData, jsonData.expires_in - 1000);
     return jsonData;
   }
 
-  public async fetchCurrentlyPlaying(useCache: boolean = true, cacheDuration: number): Promise<Song | null> {
-    if (useCache) {
+  public async fetchCurrentlyPlaying(): Promise<Song | null> {
+    if (this.useCache) {
       const cachedSong = this.storer.get<Song>(SPOTIFY_TRACK_KEY);
 
       if (cachedSong) {
@@ -88,13 +92,13 @@ export class SpotifyStreamer implements IStreamer {
     }
 
     if (response.status === 204 || !response.ok) {
-      return this.fetchLastPlayed(accessToken, useCache, cacheDuration);
+      return this.fetchLastPlayed(accessToken);
     }
 
     const jsonData = await response.json() as SpotifyCurrrentlyPlayingResponse;
 
     if (!jsonData.is_playing || jsonData.currently_playing_type !== 'track') {
-      return this.fetchLastPlayed(accessToken, useCache, cacheDuration);
+      return this.fetchLastPlayed(accessToken);
     }
 
     const track = jsonData.item;
@@ -108,11 +112,13 @@ export class SpotifyStreamer implements IStreamer {
       url: track.external_urls.spotify,
     };
 
-    this.storer.set(SPOTIFY_TRACK_KEY, song, cacheDuration);
+    if (this.useCache) {
+      this.storer.set(SPOTIFY_TRACK_KEY, song, this.cacheDuration);
+    }
     return song;
   }
 
-  private async fetchLastPlayed(accessToken: SpotifyAccessToken, useCache: boolean, cacheDuration: number): Promise<Song | null> {
+  private async fetchLastPlayed(accessToken: SpotifyAccessToken): Promise<Song | null> {
     const headers = { Authorization: `Bearer ${accessToken.access_token}`, 'Content-Type': 'application/json', Accept: 'application/json' };
     const response: Response = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', { method: 'GET', headers });
     const jsonData = await response.json() as SpotifyRecentlyPlayedResponse;
@@ -131,8 +137,8 @@ export class SpotifyStreamer implements IStreamer {
       url: lastPlayedTrack.external_urls.spotify,
     };
 
-    if (useCache) {
-      this.storer.set(SPOTIFY_TRACK_KEY, lastPlayed, cacheDuration);
+    if (this.useCache) {
+      this.storer.set(SPOTIFY_TRACK_KEY, lastPlayed, this.cacheDuration);
     }
 
     return lastPlayed;

@@ -6,18 +6,8 @@ export enum Providers {
 }
 
 export const providerSchema = z.nativeEnum(Providers);
-// export type Provider = z.infer<typeof providerSchema>;
-
-export const StorageKinds = {
-  INMEMORY: "INMEMORY",
-  // SQLITE: 'SQLITE',
-} as const;
-
-export const storageKindSchema = z.nativeEnum(StorageKinds);
-export type StorageKind = z.infer<typeof storageKindSchema>;
 
 export const BaseNowPlayingArgsSchema = z.object({
-  storageKind: storageKindSchema.optional(),
   useCache: z.boolean().optional(),
   cacheDuration: z
     .number()

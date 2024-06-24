@@ -1,5 +1,5 @@
 export interface IStorer {
-  set<T>(key: string, value: T, duration?: number): void;
+  set<T>(key: string, value: T, duration: number): void;
   get<T>(key: string): T | undefined;
   delete(key: string): boolean;
   has(key: string): boolean;
@@ -7,7 +7,7 @@ export interface IStorer {
   pruneExpiredEntries(): void;
 }
 
-export interface DataEntry<T> {
+export interface CacheData<T> {
   value: T;
   expiresAt: number;
 }

@@ -23,11 +23,9 @@ yarn add @BolajiOlajide/now-playing
 import {
   NowPlaying,
   Providers,
-  StorageKinds,
 } from "@BolajiOlajide/now-playing";
 
 const np = new NowPlaying(Providers.SPOTIFY, {
-  storageKind: StorageKinds.INMEMORY,
   useCache: false, // default is true
   cacheDuration: 30000, // in milliseconds
   streamerArgs: {
@@ -48,7 +46,7 @@ const np = new NowPlaying(Providers.SPOTIFY, {
 
 You need two things.
 
-1. Spotify Client ID 
+1. Spotify Client ID
 2. Spotify Client Secret
 2. Spotify Refresh Token
 

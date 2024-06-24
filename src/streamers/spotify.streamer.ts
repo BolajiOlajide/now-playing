@@ -63,7 +63,7 @@ export class SpotifyStreamer implements IStreamer {
 
     const response: Response = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers, body: params });
     const jsonData = await response.json() as SpotifyAccessToken;
-    this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData);
+    this.storer.set(SPOTIFY_ACCESS_TOKEN_KEY, jsonData, jsonData.expires_in - 1000);
     return jsonData;
   }
 
@@ -108,7 +108,9 @@ export class SpotifyStreamer implements IStreamer {
       url: track.external_urls.spotify,
     };
 
-    this.storer.set(SPOTIFY_TRACK_KEY, song, cacheDuration);
+    if (useCache) {
+      this.storer.set(SPOTIFY_TRACK_KEY, song, cacheDuration);
+    }
     return song;
   }
 

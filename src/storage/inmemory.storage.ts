@@ -1,7 +1,7 @@
-import type { IStorer, CacheDate } from "./types";
+import type { IStorer, CacheData } from "./types";
 
 export class InMemoryStorage implements IStorer {
-  private data: Map<string, CacheDate<unknown>> = new Map();
+  private data: Map<string, CacheData<unknown>> = new Map();
 
   set<T>(key: string, value: T, duration: number): void {
     const expiresAt = Date.now() + duration;
@@ -57,7 +57,7 @@ export class InMemoryStorage implements IStorer {
     }
   }
 
-  private entryIsStillValid(entry: CacheDate<unknown>): boolean {
+  private entryIsStillValid(entry: CacheData<unknown>): boolean {
     return entry.expiresAt > Date.now();
   }
 }

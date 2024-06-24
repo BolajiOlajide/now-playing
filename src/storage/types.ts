@@ -7,7 +7,7 @@ export interface IStorer {
   pruneExpiredEntries(): void;
 }
 
-export interface CacheDate<T> {
+export interface CacheData<T> {
   value: T;
   expiresAt: number;
 }

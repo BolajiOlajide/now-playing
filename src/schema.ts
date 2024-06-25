@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 import { z } from 'zod'
+=======
+import * as z from 'zod'
+>>>>>>> dface95 (add tests)
 
 export enum Providers {
-  SPOTIFY = 'SPOTIFY',
-  NOOP = 'NOOP',
+    SPOTIFY = 'SPOTIFY',
+    NOOP = 'NOOP',
 }
 
 export const providerSchema = z.nativeEnum(Providers)

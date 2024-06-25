@@ -20,10 +20,7 @@ yarn add @BolajiOlajide/now-playing
 ## Usage
 
 ```ts
-import {
-  NowPlaying,
-  Providers,
-} from "@BolajiOlajide/now-playing";
+import { NowPlaying, Providers } from "@BolajiOlajide/now-playing";
 
 const np = new NowPlaying(Providers.SPOTIFY, {
   useCache: false, // default is true
@@ -36,9 +33,9 @@ const np = new NowPlaying(Providers.SPOTIFY, {
 });
 ```
 
-### Storage Kinds
+### Storage
 
-- **INMEMORY**: Stores data in memory. This is the default option and suitable to reduce overhead.
+Data is stored in memory. This is to reduce overhead. We plan to expose the `IStorer` interface later to allow you to use your own storage mechanism.
 
 ### Providers
 
@@ -48,7 +45,7 @@ You need two things.
 
 1. Spotify Client ID
 2. Spotify Client Secret
-2. Spotify Refresh Token
+3. Spotify Refresh Token
 
 To get your Spotify Client ID and sercet, follow these steps:
 

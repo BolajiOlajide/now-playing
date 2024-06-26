@@ -29,7 +29,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-<<<<<<< HEAD
 
       - name: Test
         run: pnpm test
@@ -38,10 +37,6 @@ jobs:
         run: |
           pnpm run build
 
-      - uses: simenandre/publish-with-pnpm@v2
-=======
-      - run: pnpm run build
       - uses: simenandre/publish-with-pnpm@v1
->>>>>>> 55a5924 (prettify everything)
         with:
           npm-auth-token: ${{ secrets.NPM_ACCESS_TOKEN }}

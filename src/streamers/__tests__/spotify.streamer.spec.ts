@@ -409,7 +409,11 @@ describe('SpotifyStreamer', () => {
   const useCache = true
   const cacheDuration = 3600
 
-  const server = setupServer(fetchAccessTokenHandler, lastPlayedSongHandler, currentlyPlayingSongHandler)
+  const server = setupServer(
+    fetchAccessTokenHandler,
+    lastPlayedSongHandler,
+    currentlyPlayingSongHandler
+  )
   beforeAll(() => {
     // Start the interception.
     server.listen({
@@ -466,7 +470,8 @@ describe('SpotifyStreamer', () => {
       expect.assertions(1)
       return streamer.getAccessToken('fake-refresh-token').catch((error) => {
         expect(error).toEqual({
-           message: 'something went wrong', status: 400
+          message: 'something went wrong',
+          status: 400,
         })
       })
     })
@@ -503,7 +508,8 @@ describe('SpotifyStreamer', () => {
         } as SpotifyAccessToken)
         .catch((error) => {
           expect(error).toEqual({
-             message: 'something went wrong', status: 400
+            message: 'something went wrong',
+            status: 400,
           })
         })
     })
@@ -567,7 +573,11 @@ describe('SpotifyStreamer', () => {
 
     beforeAll(() => {
       const fakeAccessToken = "bolaji's fake access token"
-      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: fakeAccessToken }, 5000)
+      storer.set(
+        SPOTIFY_ACCESS_TOKEN_KEY,
+        { access_token: fakeAccessToken },
+        5000
+      )
     })
     afterAll(() => {
       streamer.setUseCache(true)
@@ -578,8 +588,9 @@ describe('SpotifyStreamer', () => {
       artiste: 'Euggy, Suraj, Mumba Yachi',
       image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
       is_playing: true,
-      preview_url: 'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-      url: 'https://open.spotify.com/track/4U6zIONOpmnby5fvOM6han?si=a7661613c3fa46c3'
+      preview_url:
+        'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+      url: 'https://open.spotify.com/track/4U6zIONOpmnby5fvOM6han?si=a7661613c3fa46c3',
     }
     test('should fetch track from cache if it exists', async () => {
       storer.set(SPOTIFY_TRACK_KEY, songResult, 5000)
@@ -588,7 +599,11 @@ describe('SpotifyStreamer', () => {
     })
 
     test('should fetch new token and make request again if endpoint returns 401', async () => {
-      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: unauthenticatedToken, expires_in: 3000 }, 5000)
+      storer.set(
+        SPOTIFY_ACCESS_TOKEN_KEY,
+        { access_token: unauthenticatedToken, expires_in: 3000 },
+        5000
+      )
       const response = await streamer.fetchCurrentlyPlaying()
       expect(response).toEqual(songResult)
 
@@ -598,7 +613,11 @@ describe('SpotifyStreamer', () => {
 
     test('should not save in cache if useCache is false', async () => {
       streamer.setUseCache(false)
-      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: unauthenticatedToken, expires_in: 3000 }, 5000)
+      storer.set(
+        SPOTIFY_ACCESS_TOKEN_KEY,
+        { access_token: unauthenticatedToken, expires_in: 3000 },
+        5000
+      )
 
       const response = await streamer.fetchCurrentlyPlaying()
       expect(response).toEqual(songResult)
@@ -608,7 +627,11 @@ describe('SpotifyStreamer', () => {
     })
 
     test('should fetch last played song if response is not ok', async () => {
-      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: currPlayingaccessTokenForError, expires_in: 3000 }, 5000)
+      storer.set(
+        SPOTIFY_ACCESS_TOKEN_KEY,
+        { access_token: currPlayingaccessTokenForError, expires_in: 3000 },
+        5000
+      )
       const response = await streamer.fetchCurrentlyPlaying()
       expect(response).toEqual({
         is_playing: false,
@@ -633,7 +656,11 @@ describe('SpotifyStreamer', () => {
     })
 
     test('should fetch last played song if no track is currently playing', async () => {
-      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: noCurrPlayingsongTOken, expires_in: 3000 }, 5000)
+      storer.set(
+        SPOTIFY_ACCESS_TOKEN_KEY,
+        { access_token: noCurrPlayingsongTOken, expires_in: 3000 },
+        5000
+      )
       const response = await streamer.fetchCurrentlyPlaying()
       expect(response).toEqual({
         is_playing: false,
@@ -658,7 +685,11 @@ describe('SpotifyStreamer', () => {
     })
 
     test('should return currently playing song', async () => {
-      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: freshAccessToken, expires_in: 3000 }, 5000)
+      storer.set(
+        SPOTIFY_ACCESS_TOKEN_KEY,
+        { access_token: freshAccessToken, expires_in: 3000 },
+        5000
+      )
       const response = await streamer.fetchCurrentlyPlaying()
       expect(response).toEqual(songResult)
     })

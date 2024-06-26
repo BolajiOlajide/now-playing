@@ -1,4 +1,9 @@
 node_modules
 dist
+<<<<<<< HEAD
 .github
 *.yaml
+=======
+examples
+.github
+>>>>>>> 54ea34a (complete tests)

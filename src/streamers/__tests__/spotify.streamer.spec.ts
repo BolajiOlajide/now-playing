@@ -1,285 +1,444 @@
-import { describe, test, expect, vi } from 'vitest'
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeAll,
+  afterAll,
+  afterEach,
+  beforeEach,
+} from 'vitest'
+import { http, HttpResponse } from 'msw'
+import { setupServer } from 'msw/node'
 
-import { SpotifyStreamer } from '../spotify.streamer'
+import { type SpotifyAccessToken, SpotifyStreamer } from '../spotify.streamer'
 import { InMemoryStorage } from '../../storage/inmemory.storage'
 import { SPOTIFY_ACCESS_TOKEN_KEY, SPOTIFY_TRACK_KEY } from '../../constants'
 
-describe('SpotifyStreamer', () => {
-    const storer = new InMemoryStorage()
-    const clientId = 'test-client-id'
-    const clientSecret = 'test-client-secret'
-    const refreshToken = 'test-refresh-token'
-    const useCache = true
-    const cacheDuration = 3600
+const freshAccessToken = 'freshAccessToken'
+const fetchAccessTokenHandler = http.post(
+  'https://accounts.spotify.com/api/token',
+  async ({ request }) => {
+    const info = await request.formData()
+    if (info.get('refresh_token') !== 'test-refresh-token') {
+      return HttpResponse.json(
+        {
+          error: {
+            message: 'something went wrong',
+            status: 400,
+          },
+        },
+        {
+          status: 400,
+          statusText: 'Bad Request',
+          headers: {
+            'content-type': 'application/json',
+          },
+        }
+      )
+    }
+    return HttpResponse.json(
+      {
+        access_token: freshAccessToken,
+        token_type: 'Bearer',
+        expires_in: 3600,
+        scope: 'user-read-email',
+      },
+      {
+        status: 201,
+        statusText: 'Created',
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  }
+)
 
-    const streamer = new SpotifyStreamer(storer, {
-        clientId,
-        clientSecret,
-        refreshToken,
-        useCache,
-        cacheDuration,
-    })
-
-    const fetchJSONResult = {
-        headers: new Headers(),
-        redirected: false,
-        statusText: '',
-        type: 'basic',
-        url: '',
-        clone: function (): Response {
-            throw new Error('Function not implemented.')
+const accessTokenForError = 'fake-access-token'
+const accessTokenForNull = 'freshAccessToken null'
+const lastPlayedSongHandler = http.get(
+  'https://api.spotify.com/v1/me/player/recently-played',
+  async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (authHeader === `Bearer ${accessTokenForError}`) {
+      return HttpResponse.json(
+        {
+          error: {
+            message: 'something went wrong',
+            status: 400,
+          },
         },
-        body: null,
-        bodyUsed: false,
-        arrayBuffer: function (): Promise<ArrayBuffer> {
-            throw new Error('Function not implemented.')
+        {
+          status: 400,
+          statusText: 'Bad Request',
+          headers: {
+            'content-type': 'application/json',
+          },
+        }
+      )
+    } else if (authHeader === `Bearer ${accessTokenForNull}`) {
+      return HttpResponse.json(
+        {
+          total: 0,
+          items: [],
         },
-        blob: function (): Promise<Blob> {
-            throw new Error('Function not implemented.')
-        },
-        formData: function (): Promise<FormData> {
-            throw new Error('Function not implemented.')
-        },
-        json: function (): Promise<any> {
-            throw new Error('Function not implemented.')
-        },
-        text: function (): Promise<string> {
-            throw new Error('Function not implemented.')
-        },
+        {
+          status: 200,
+          statusText: 'OK',
+        }
+      )
     }
 
-    test('should fetch access token', async () => {
-        const fetchMock = vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-            ...fetchJSONResult,
-            // headers: new Headers({
-            //   'content-type': 'application/json',
-            // }),
-            json: vi.fn().mockResolvedValue({
-                access_token: 'test-access-token',
-                token_type: 'Bearer',
-                expires_in: 3600,
-                scope: 'test-scope',
-                created_at: Date.now(),
-            }),
-            status: 200,
-            ok: true,
-        })
+    return HttpResponse.json(
+      {
+        total: 1,
+        items: [
+          {
+            track: {
+              name: 'Coming Home',
+              artists: [{ name: 'Kanye West' }],
+              external_urls: {
+                spotify:
+                  'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
+              },
+              album: {
+                images: [
+                  { url: 'https://i.scdn.co/image/ab67616d0000b273712549143' },
+                ],
+              },
+              preview_url:
+                'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+            },
+          },
+        ],
+      },
+      {
+        status: 200,
+        statusText: 'OK',
+      }
+    )
+  }
+)
 
-        const accessToken = await streamer.getAccessToken(refreshToken)
-
-        expect(fetchMock).toHaveBeenCalledWith(
-            'https://accounts.spotify.com/api/token',
-            {
-                method: 'POST',
-                headers: {
-                    Authorization: expect.any(String),
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: expect.any(URLSearchParams),
-            }
-        )
-        expect(accessToken).toHaveProperty('access_token', 'test-access-token')
-        expect(storer.get(SPOTIFY_ACCESS_TOKEN_KEY)).toEqual(accessToken)
-
-        fetchMock.mockRestore()
-    })
-
-    test('should fetch currently playing song', async () => {
-        const accessToken = {
-            access_token: 'test-access-token',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'test-scope',
-            created_at: Date.now(),
+const currPlayingaccessTokenForError = 'currPlayingaccessTokenForError'
+const noCurrPlayingsongTOken = 'noCurrPlayingsongTOken'
+const unauthenticatedToken = 'unauthenticatedToken'
+const currentlyPlayingSongHandler = http.get('https://api.spotify.com/v1/me/player/currently-playing', async ({ request }) => {
+  const authHeader = request.headers.get('Authorization')
+    if (authHeader === `Bearer ${currPlayingaccessTokenForError}`) {
+      return HttpResponse.json(
+        {
+          error: {
+            message: 'something went wrong',
+            status: 400,
+          },
+        },
+        {
+          status: 400,
+          statusText: 'Bad Request',
         }
-        storer.set(
-            SPOTIFY_ACCESS_TOKEN_KEY,
-            accessToken,
-            accessToken.expires_in - 1000
-        )
-
-        const fetchMock = vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-            json: vi.fn().mockResolvedValue({
-                is_playing: true,
-                currently_playing_type: 'track',
-                item: {
-                    name: 'Test Song',
-                    artists: [{ name: 'Test Artist' }],
-                    external_urls: {
-                        spotify: 'https://open.spotify.com/track/test-track-id',
-                    },
-                    album: {
-                        images: [{ url: 'https://example.com/album-art.jpg' }],
-                    },
-                    preview_url: 'https://example.com/preview.mp3',
-                },
-            }),
-            status: 200,
-            ok: true,
-        })
-
-        const song = await streamer.fetchCurrentlyPlaying()
-
-        expect(fetchMock).toHaveBeenCalledWith(
-            'https://api.spotify.com/v1/me/player/currently-playing',
+      )
+    } else if (authHeader === `Bearer ${noCurrPlayingsongTOken}`) {
+      return HttpResponse.json({
+        is_playing: false,
+      })
+    } else if (authHeader === `Bearer ${unauthenticatedToken}`) {
+      return HttpResponse.json({
+        error: {
+          status: 401,
+          message: 'The access token expired',
+        },
+      }, {
+        status: 401,
+        statusText: 'Unauthorized',
+      })
+    }
+    return HttpResponse.json({
+      is_playing: true,
+      currently_playing_type: 'track',
+      item: {
+        name: 'Kolwa',
+        artists: [
+          { name: 'Euggy' },
+          { name: 'Suraj' },
+          { name: 'Mumba Yachi' },
+        ],
+        external_urls: {
+          spotify: 'https://open.spotify.com/track/4U6zIONOpmnby5fvOM6han?si=a7661613c3fa46c3',
+        },
+        album: {
+          images: [
             {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${accessToken.access_token}`,
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            }
-        )
-        expect(song).toEqual({
-            is_playing: true,
-            title: 'Test Song',
-            artiste: 'Test Artist',
-            image_url: 'https://example.com/album-art.jpg',
-            preview_url: 'https://example.com/preview.mp3',
-            url: 'https://open.spotify.com/track/test-track-id',
-        })
-        expect(storer.get(SPOTIFY_TRACK_KEY)).toEqual(song)
+              url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+            },
+          ],
+        },
+        preview_url: 'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+      }
+    })
+})
 
-        fetchMock.mockRestore()
+describe('SpotifyStreamer', () => {
+  const storer = new InMemoryStorage()
+  const clientId = 'test-client-id'
+  const clientSecret = 'test-client-secret'
+  const refreshToken = 'test-refresh-token'
+  const useCache = true
+  const cacheDuration = 3600
+
+  const server = setupServer(fetchAccessTokenHandler, lastPlayedSongHandler, currentlyPlayingSongHandler)
+  beforeAll(() => {
+    // Start the interception.
+    server.listen({
+      // This tells MSW to throw an error whenever it
+      // encounters a request that doesn't have a
+      // matching request handler.
+      onUnhandledRequest: 'error',
+    })
+  })
+
+  afterEach(() => {
+    // Remove any handlers you may have added
+    // in individual tests (runtime handlers).
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    // Disable request interception and clean up.
+    server.close()
+  })
+
+  describe('getAccessToken()', () => {
+    const streamer = new SpotifyStreamer(storer, {
+      clientId,
+      clientSecret,
+      refreshToken,
+      useCache,
+      cacheDuration,
     })
 
-    test('should fetch last played song when currently playing is not available', async () => {
-        const accessToken = {
-            access_token: 'test-access-token',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'test-scope',
-            created_at: Date.now(),
-        }
-        storer.set(
-            SPOTIFY_ACCESS_TOKEN_KEY,
-            accessToken,
-            accessToken.expires_in - 1000
-        )
+    beforeEach(() => {
+      storer.clear()
+    })
 
-        const fetchMock = vi
-            .spyOn(global, 'fetch')
-            .mockResolvedValueOnce({ status: 204, ok: false })
-            .mockResolvedValueOnce({
-                json: vi.fn().mockResolvedValue({
-                    total: 1,
-                    items: [
-                        {
-                            track: {
-                                name: 'Last Played Song',
-                                artists: [{ name: 'Last Played Artist' }],
-                                external_urls: {
-                                    spotify:
-                                        'https://open.spotify.com/track/last-played-track-id',
-                                },
-                                album: {
-                                    images: [
-                                        {
-                                            url: 'https://example.com/last-played-album-art.jpg',
-                                        },
-                                    ],
-                                },
-                                preview_url:
-                                    'https://example.com/last-played-preview.mp3',
-                            },
-                        },
-                    ],
-                }),
-                status: 200,
-                ok: true,
-            })
+    test('fetch from cache if available', async () => {
+      const fakeAccessToken = "bolaji's fake access token"
+      const payload = { access_token: fakeAccessToken }
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, payload, 5000)
+      const response = await streamer.getAccessToken(refreshToken)
+      expect(response.access_token).toBe(fakeAccessToken)
+    })
 
-        const song = await streamer.fetchCurrentlyPlaying()
+    test('fetch from spotify if not available in cache (and save in cache afterwards', async () => {
+      const response = await streamer.getAccessToken(refreshToken)
+      expect(response.access_token).toBe(freshAccessToken)
 
-        expect(fetchMock).toHaveBeenCalledWith(
-            'https://api.spotify.com/v1/me/player/currently-playing',
-            {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${accessToken.access_token}`,
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            }
-        )
-        expect(fetchMock).toHaveBeenCalledWith(
-            'https://api.spotify.com/v1/me/player/recently-played?limit=1',
-            {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${accessToken.access_token}`,
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            }
-        )
-        expect(song).toEqual({
-            is_playing: false,
-            title: 'Last Played Song',
-            artiste: 'Last Played Artist',
-            image_url: 'https://example.com/last-played-album-art.jpg',
-            preview_url: 'https://example.com/last-played-preview.mp3',
-            url: 'https://open.spotify.com/track/last-played-track-id',
+      const storedToken = storer.get<SpotifyAccessToken>(
+        SPOTIFY_ACCESS_TOKEN_KEY
+      )
+      expect(storedToken).toEqual(response)
+    })
+
+    test('throw error if token fetching is unsuccessful', async () => {
+      expect.assertions(1)
+      return streamer.getAccessToken('fake-refresh-token').catch((error) => {
+        expect(error).toEqual({
+           message: 'something went wrong', status: 400
         })
-        expect(storer.get(SPOTIFY_TRACK_KEY)).toEqual(song)
+      })
+    })
+  })
 
-        fetchMock.mockRestore()
+  describe('fetchLastPlayed()', () => {
+    const streamer = new SpotifyStreamer(storer, {
+      clientId,
+      clientSecret,
+      refreshToken,
+      useCache,
+      cacheDuration,
     })
 
-    test('should return null when no recently played song is available', async () => {
-        const accessToken = {
-            access_token: 'test-access-token',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'test-scope',
-            created_at: Date.now(),
-        }
-        storer.set(
-            SPOTIFY_ACCESS_TOKEN_KEY,
-            accessToken,
-            accessToken.expires_in - 1000
-        )
-
-        const fetchMock = vi
-            .spyOn(global, 'fetch')
-            .mockResolvedValueOnce({
-                status: 204,
-                ok: false,
-            })
-            .mockResolvedValueOnce({
-                json: vi.fn().mockResolvedValue({ total: 0, items: [] }),
-                status: 200,
-                ok: true,
-            })
-
-        const song = await streamer.fetchCurrentlyPlaying()
-
-        expect(fetchMock).toHaveBeenCalledWith(
-            'https://api.spotify.com/v1/me/player/currently-playing',
-            {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${accessToken.access_token}`,
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            }
-        )
-        expect(fetchMock).toHaveBeenCalledWith(
-            'https://api.spotify.com/v1/me/player/recently-played?limit=1',
-            {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${accessToken.access_token}`,
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            }
-        )
-        expect(song).toBeNull()
-        expect(storer.get(SPOTIFY_TRACK_KEY)).toBeUndefined()
-
-        fetchMock.mockRestore()
+    beforeEach(() => {
+      streamer.setUseCache(true)
+      storer.clear()
     })
+
+    beforeAll(() => {
+      const fakeAccessToken = "bolaji's fake access token"
+      const payload = { access_token: fakeAccessToken }
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, payload, 5000)
+    })
+    afterAll(() => {
+      streamer.setUseCache(true)
+    })
+
+    test('should return an error if http request errors', async () => {
+      expect.assertions(1)
+      return streamer
+        .fetchLastPlayed({
+          access_token: accessTokenForError,
+        } as SpotifyAccessToken)
+        .catch((error) => {
+          expect(error).toEqual({
+             message: 'something went wrong', status: 400
+          })
+        })
+    })
+
+    test('should return null if endpoint doesnt contain item', async () => {
+      const response = await streamer.fetchLastPlayed({
+        access_token: accessTokenForNull,
+      } as SpotifyAccessToken)
+      expect(response).toBeNull()
+    })
+
+    test('should return the last played song and not cache if useCache is false', async () => {
+      streamer.setUseCache(false)
+      const response = await streamer.fetchLastPlayed({
+        access_token: freshAccessToken,
+      } as SpotifyAccessToken)
+      const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
+      expect(cachedSong).toBeUndefined()
+      expect(response).toEqual({
+        is_playing: false,
+        title: 'Coming Home',
+        artiste: 'Kanye West',
+        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+        preview_url:
+          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
+      })
+    })
+
+    test('should return the last played song and cache if useCache is true', async () => {
+      const response = await streamer.fetchLastPlayed({
+        access_token: freshAccessToken,
+      } as SpotifyAccessToken)
+      const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
+      expect(cachedSong).toEqual(response)
+      expect(response).toEqual({
+        is_playing: false,
+        title: 'Coming Home',
+        artiste: 'Kanye West',
+        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+        preview_url:
+          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
+      })
+    })
+  })
+
+  describe('fetchCurrentlyPlaying', () => {
+    const streamer = new SpotifyStreamer(storer, {
+      clientId,
+      clientSecret,
+      refreshToken,
+      useCache,
+      cacheDuration,
+    })
+
+    beforeEach(() => {
+      streamer.setUseCache(true)
+      storer.clear()
+    })
+
+    beforeAll(() => {
+      const fakeAccessToken = "bolaji's fake access token"
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: fakeAccessToken }, 5000)
+    })
+    afterAll(() => {
+      streamer.setUseCache(true)
+    })
+
+    const songResult = {
+      title: 'Kolwa',
+      artiste: 'Euggy, Suraj, Mumba Yachi',
+      image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+      is_playing: true,
+      preview_url: 'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+      url: 'https://open.spotify.com/track/4U6zIONOpmnby5fvOM6han?si=a7661613c3fa46c3'
+    }
+    test('should fetch track from cache if it exists', async () => {
+      storer.set(SPOTIFY_TRACK_KEY, songResult, 5000)
+      const response = await streamer.fetchCurrentlyPlaying()
+      expect(response).toEqual(songResult)
+    })
+
+    test('should fetch new token and make request again if endpoint returns 401', async () => {
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: unauthenticatedToken, expires_in: 3000 }, 5000)
+      const response = await streamer.fetchCurrentlyPlaying()
+      expect(response).toEqual(songResult)
+
+      const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
+      expect(cachedSong).toEqual(response)
+    })
+
+    test('should not save in cache if useCache is false', async () => {
+      streamer.setUseCache(false)
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: unauthenticatedToken, expires_in: 3000 }, 5000)
+
+      const response = await streamer.fetchCurrentlyPlaying()
+      expect(response).toEqual(songResult)
+
+      const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
+      expect(cachedSong).toBeUndefined()
+    })
+
+    test('should fetch last played song if response is not ok', async () => {
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: currPlayingaccessTokenForError, expires_in: 3000 }, 5000)
+      const response = await streamer.fetchCurrentlyPlaying()
+      expect(response).toEqual({
+        is_playing: false,
+        title: 'Coming Home',
+        artiste: 'Kanye West',
+        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+        preview_url:
+          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
+      })
+
+      const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
+      expect(cachedSong).toEqual({
+        is_playing: false,
+        title: 'Coming Home',
+        artiste: 'Kanye West',
+        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+        preview_url:
+          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
+      })
+    })
+
+    test('should fetch last played song if no track is currently playing', async () => {
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: noCurrPlayingsongTOken, expires_in: 3000 }, 5000)
+      const response = await streamer.fetchCurrentlyPlaying()
+      expect(response).toEqual({
+        is_playing: false,
+        title: 'Coming Home',
+        artiste: 'Kanye West',
+        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+        preview_url:
+          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
+      })
+
+      const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
+      expect(cachedSong).toEqual({
+        is_playing: false,
+        title: 'Coming Home',
+        artiste: 'Kanye West',
+        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
+        preview_url:
+          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
+        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
+      })
+    })
+
+    test('should return currently playing song', async () => {
+      storer.set(SPOTIFY_ACCESS_TOKEN_KEY, { access_token: freshAccessToken, expires_in: 3000 }, 5000)
+      const response = await streamer.fetchCurrentlyPlaying()
+      expect(response).toEqual(songResult)
+    })
+  })
 })

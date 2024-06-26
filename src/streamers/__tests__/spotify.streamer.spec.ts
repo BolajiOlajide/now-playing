@@ -14,7 +14,11 @@ import { setupServer } from 'msw/node'
 import { type SpotifyAccessToken, SpotifyStreamer } from '../spotify.streamer'
 import { InMemoryStorage } from '../../storage/inmemory.storage'
 import { SPOTIFY_ACCESS_TOKEN_KEY, SPOTIFY_TRACK_KEY } from '../../constants'
-import { CurrentlyPlayingTrackResponse, KanyeHomeComingSong, KanyeHomeComingSongResponse } from '../../fixtures/spotify.fixture'
+import {
+  CurrentlyPlayingTrackResponse,
+  KanyeHomeComingSong,
+  KanyeHomeComingSongResponse,
+} from '../../fixtures/spotify.fixture'
 
 const freshAccessToken = 'freshAccessToken'
 const fetchAccessTokenHandler = http.post(

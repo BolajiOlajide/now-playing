@@ -22,7 +22,7 @@
   ],
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "node-fetch": "2.6.7",
     "zod": "3.23.8"

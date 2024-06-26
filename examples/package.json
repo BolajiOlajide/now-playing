@@ -1,0 +1,16 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "ex:spotify": "ts-node examples/spotify.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@BolajiOlajide/now-playing": "file:..",
+    "ts-node": "^10.9.2"
+  }
+}

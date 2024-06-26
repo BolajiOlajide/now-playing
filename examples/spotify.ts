@@ -1,4 +1,4 @@
-import { NowPlaying, Providers } from '../dist'
+import { NowPlaying, Providers } from '@BolajiOlajide/now-playing'
 
 const np = new NowPlaying(Providers.SPOTIFY, {
   streamerArgs: {

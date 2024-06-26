@@ -14,6 +14,7 @@ import { setupServer } from 'msw/node'
 import { type SpotifyAccessToken, SpotifyStreamer } from '../spotify.streamer'
 import { InMemoryStorage } from '../../storage/inmemory.storage'
 import { SPOTIFY_ACCESS_TOKEN_KEY, SPOTIFY_TRACK_KEY } from '../../constants'
+import { CurrentlyPlayingTrackResponse, KanyeHomeComingSong, KanyeHomeComingSongResponse } from '../../fixtures/spotify.fixture'
 
 const freshAccessToken = 'freshAccessToken'
 const fetchAccessTokenHandler = http.post(
@@ -93,25 +94,7 @@ const lastPlayedSongHandler = http.get(
     return HttpResponse.json(
       {
         total: 1,
-        items: [
-          {
-            track: {
-              name: 'Coming Home',
-              artists: [{ name: 'Kanye West' }],
-              external_urls: {
-                spotify:
-                  'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
-              },
-              album: {
-                images: [
-                  { url: 'https://i.scdn.co/image/ab67616d0000b273712549143' },
-                ],
-              },
-              preview_url:
-                'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-            },
-          },
-        ],
+        items: [KanyeHomeComingSongResponse],
       },
       {
         status: 200,
@@ -162,27 +145,7 @@ const currentlyPlayingSongHandler = http.get(
     return HttpResponse.json({
       is_playing: true,
       currently_playing_type: 'track',
-      item: {
-        name: 'Kolwa',
-        artists: [
-          { name: 'Euggy' },
-          { name: 'Suraj' },
-          { name: 'Mumba Yachi' },
-        ],
-        external_urls: {
-          spotify:
-            'https://open.spotify.com/track/4U6zIONOpmnby5fvOM6han?si=a7661613c3fa46c3',
-        },
-        album: {
-          images: [
-            {
-              url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
-            },
-          ],
-        },
-        preview_url:
-          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-      },
+      item: CurrentlyPlayingTrackResponse,
     })
   }
 )
@@ -314,15 +277,7 @@ describe('SpotifyStreamer', () => {
       } as SpotifyAccessToken)
       const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
       expect(cachedSong).toBeUndefined()
-      expect(response).toEqual({
-        is_playing: false,
-        title: 'Coming Home',
-        artiste: 'Kanye West',
-        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
-        preview_url:
-          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
-      })
+      expect(response).toEqual(KanyeHomeComingSong)
     })
 
     test('should return the last played song and cache if useCache is true', async () => {
@@ -331,15 +286,7 @@ describe('SpotifyStreamer', () => {
       } as SpotifyAccessToken)
       const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
       expect(cachedSong).toEqual(response)
-      expect(response).toEqual({
-        is_playing: false,
-        title: 'Coming Home',
-        artiste: 'Kanye West',
-        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
-        preview_url:
-          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
-      })
+      expect(response).toEqual(KanyeHomeComingSong)
     })
   })
 
@@ -419,26 +366,10 @@ describe('SpotifyStreamer', () => {
         5000
       )
       const response = await streamer.fetchCurrentlyPlaying()
-      expect(response).toEqual({
-        is_playing: false,
-        title: 'Coming Home',
-        artiste: 'Kanye West',
-        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
-        preview_url:
-          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
-      })
+      expect(response).toEqual(KanyeHomeComingSong)
 
       const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
-      expect(cachedSong).toEqual({
-        is_playing: false,
-        title: 'Coming Home',
-        artiste: 'Kanye West',
-        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
-        preview_url:
-          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
-      })
+      expect(cachedSong).toEqual(KanyeHomeComingSong)
     })
 
     test('should fetch last played song if no track is currently playing', async () => {
@@ -448,26 +379,10 @@ describe('SpotifyStreamer', () => {
         5000
       )
       const response = await streamer.fetchCurrentlyPlaying()
-      expect(response).toEqual({
-        is_playing: false,
-        title: 'Coming Home',
-        artiste: 'Kanye West',
-        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
-        preview_url:
-          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
-      })
+      expect(response).toEqual(KanyeHomeComingSong)
 
       const cachedSong = storer.get(SPOTIFY_TRACK_KEY)
-      expect(cachedSong).toEqual({
-        is_playing: false,
-        title: 'Coming Home',
-        artiste: 'Kanye West',
-        image_url: 'https://i.scdn.co/image/ab67616d0000b273712549143',
-        preview_url:
-          'https://p.scdn.co/mp3-preview/0663627c27885467868491a91185643b0508975c?cid=774b29d4f13844c495f206cafdad9c86',
-        url: 'https://open.spotify.com/track/6M2wZ9GZgrQXHCFfjv46we',
-      })
+      expect(cachedSong).toEqual(KanyeHomeComingSong)
     })
 
     test('should return currently playing song', async () => {

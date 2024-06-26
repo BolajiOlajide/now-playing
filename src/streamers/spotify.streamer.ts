@@ -21,7 +21,7 @@ interface SpotifyError {
   message: string
 }
 
-type SpotifyTrack = {
+export interface SpotifyTrack {
   name: string
   artists: Array<{ name: string }>
   external_urls: { spotify: string }

@@ -41,7 +41,7 @@ Data is stored in memory. This is to reduce overhead. We plan to expose the `ISt
 
 #### Spotify
 
-You need two things.
+You need three things.
 
 1. Spotify Client ID
 2. Spotify Client Secret

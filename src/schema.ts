@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { z } from 'zod'
-=======
-import * as z from 'zod'
->>>>>>> dface95 (add tests)
 
 export enum Providers {
   SPOTIFY = 'SPOTIFY',

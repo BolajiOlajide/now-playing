@@ -1,34 +1,35 @@
 name: Publish Package to npmjs
 on:
-    release:
-        types: [published]
+  release:
+    types: [published]
 
 permissions:
-    # Give the default GITHUB_TOKEN write permission to commit and push the
-    # added or changed files to the repository.
-    contents: write
+  # Give the default GITHUB_TOKEN write permission to commit and push the
+  # added or changed files to the repository.
+  contents: write
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - uses: pnpm/action-setup@v4
-              name: Install pnpm
-              with:
-                  version: 8
-                  run_install: false
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
 
-            - uses: actions/setup-node@v4
-              with:
-                  cache: 'pnpm'
-                  node-version-file: '.nvmrc'
-                  registry-url: https://registry.npmjs.org
-                  scope: '@bolajiolajide'
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+          node-version-file: '.nvmrc'
+          registry-url: https://registry.npmjs.org
+          scope: '@bolajiolajide'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+<<<<<<< HEAD
 
       - name: Test
         run: pnpm test
@@ -38,5 +39,9 @@ jobs:
           pnpm run build
 
       - uses: simenandre/publish-with-pnpm@v2
+=======
+      - run: pnpm run build
+      - uses: simenandre/publish-with-pnpm@v1
+>>>>>>> 55a5924 (prettify everything)
         with:
           npm-auth-token: ${{ secrets.NPM_ACCESS_TOKEN }}

@@ -1,9 +1,12 @@
 node_modules
 dist
 <<<<<<< HEAD
+<<<<<<< HEAD
 .github
 *.yaml
 =======
 examples
 .github
 >>>>>>> 54ea34a (complete tests)
+=======
+>>>>>>> 55a5924 (prettify everything)

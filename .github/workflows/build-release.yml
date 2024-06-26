@@ -22,10 +22,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          cache: 'pnpm'
-          node-version-file: '.nvmrc'
+          cache: "pnpm"
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org
-          scope: '@bolajiolajide'
+          scope: "@bolajiolajide"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -33,9 +33,9 @@ jobs:
       - name: Test
         run: pnpm test
 
-      -   name: Build
-          run: |
-            pnpm run build
+      - name: Build
+        run: |
+          pnpm run build
 
       - uses: simenandre/publish-with-pnpm@v1
         with:

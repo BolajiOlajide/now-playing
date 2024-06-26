@@ -1,4 +1,4 @@
-import { NowPlaying, Providers } from "../dist";
+import { NowPlaying, Providers } from '../dist'
 
 const np = new NowPlaying(Providers.SPOTIFY, {
   streamerArgs: {
@@ -6,7 +6,6 @@ const np = new NowPlaying(Providers.SPOTIFY, {
     clientSecret: 'bar',
     refreshToken: 'baz',
   },
-});
+})
 
-
-console.log("Hello World", np);
+console.log('Hello World', np)

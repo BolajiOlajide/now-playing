@@ -20,17 +20,17 @@ yarn add @BolajiOlajide/now-playing
 ## Usage
 
 ```ts
-import { NowPlaying, Providers } from "@BolajiOlajide/now-playing";
+import { NowPlaying, Providers } from '@BolajiOlajide/now-playing'
 
 const np = new NowPlaying(Providers.SPOTIFY, {
   useCache: false, // default is true
   cacheDuration: 30000, // in milliseconds
   streamerArgs: {
-    clientId: "foo",
-    clientSecret: "bar",
-    refreshToken: "baz",
+    clientId: 'foo',
+    clientSecret: 'bar',
+    refreshToken: 'baz',
   },
-});
+})
 ```
 
 ### Storage
@@ -41,7 +41,7 @@ Data is stored in memory. This is to reduce overhead. We plan to expose the `ISt
 
 #### Spotify
 
-You need two things.
+You need three things.
 
 1. Spotify Client ID
 2. Spotify Client Secret

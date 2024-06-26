@@ -11,7 +11,12 @@ import {
   SpotifyStreamerArgs,
 } from './schema'
 import { InMemoryStorage, type IStorer } from './storage'
-import { SpotifyStreamer, NoopStreamer, type IStreamer, Song } from './streamers'
+import {
+  SpotifyStreamer,
+  NoopStreamer,
+  type IStreamer,
+  Song,
+} from './streamers'
 import { ValidationError } from './error'
 
 // NowPlaying allows one to get the currently playing song for a streaming platform
@@ -37,7 +42,7 @@ export class NowPlaying {
       this.parseArgs(args)
       this.streamerArgs = args.streamerArgs
       this.useCache = args.useCache || true
-      this.cacheDuration = args.cacheDuration || CACHE_DURATION_MS;
+      this.cacheDuration = args.cacheDuration || CACHE_DURATION_MS
 
       // We only support in memory storage for now, if there's a need we can
       // support more storage mechanism.
@@ -72,10 +77,16 @@ export class NowPlaying {
   }
 
   private getStreamer(): IStreamer {
-    const cacheOpts = { useCache: this.useCache, cacheDuration: this.cacheDuration }
+    const cacheOpts = {
+      useCache: this.useCache,
+      cacheDuration: this.cacheDuration,
+    }
     switch (this.provider) {
       case Providers.SPOTIFY:
-        return new SpotifyStreamer(this.storer, { ...this.streamerArgs as SpotifyStreamerArgs, ...cacheOpts })
+        return new SpotifyStreamer(this.storer, {
+          ...(this.streamerArgs as SpotifyStreamerArgs),
+          ...cacheOpts,
+        })
       case Providers.NOOP:
         return new NoopStreamer()
       default:

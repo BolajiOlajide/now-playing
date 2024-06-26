@@ -1,34 +1,34 @@
-import typescript from "@rollup/plugin-typescript";
-import dts from "rollup-plugin-dts";
+import typescript from '@rollup/plugin-typescript'
+import dts from 'rollup-plugin-dts'
 
 const config = [
   {
-    input: "./src/index.ts",
+    input: './src/index.ts',
     output: [
       {
-        file: "dist/now-playing.mjs",
-        format: "esm",
+        file: 'dist/now-playing.mjs',
+        format: 'esm',
         sourcemap: true,
-        name: "NowPlaying",
+        name: 'NowPlaying',
       },
       {
-        file: "./dist/now-playing.js",
-        format: "umd",
+        file: './dist/now-playing.js',
+        format: 'umd',
         sourcemap: true,
-        name: "NowPlaying",
+        name: 'NowPlaying',
       },
     ],
-    external: ["zod", "node-fetch"],
+    external: ['zod', 'node-fetch'],
     plugins: [typescript()],
   },
   {
-    input: "./src/index.ts",
+    input: './src/index.ts',
     output: {
-      file: "dist/now-playing.d.ts",
-      format: "esm",
+      file: 'dist/now-playing.d.ts',
+      format: 'esm',
     },
     plugins: [dts()],
   },
-];
+]
 
-export default config;
+export default config

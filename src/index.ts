@@ -1,2 +1,2 @@
 export { NowPlaying } from './main'
-export {  Providers } from './schema'
+export { Providers } from './schema'

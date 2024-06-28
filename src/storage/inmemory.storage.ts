@@ -30,8 +30,8 @@ export class InMemoryStorage implements IStorer {
     if (entry && this.entryIsStillValid(entry)) {
       return true
     }
-      this.data.delete(key)
-      return false
+    this.data.delete(key)
+    return false
   }
 
   delete(key: string): boolean {

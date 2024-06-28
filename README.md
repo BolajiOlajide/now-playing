@@ -21,7 +21,6 @@ yarn add @BolajiOlajide/now-playing
 
 ```ts
 import { NowPlaying, Providers } from '@BolajiOlajide/now-playing'
-import { NowPlaying, Providers } from '@BolajiOlajide/now-playing'
 
 const np = new NowPlaying(Providers.SPOTIFY, {
   useCache: false, // default is true

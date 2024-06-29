@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { IStorer } from './storage'
+import type { IStorer } from './storage'
 
 export enum Providers {
   SPOTIFY = 'SPOTIFY',

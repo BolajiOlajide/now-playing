@@ -58,7 +58,7 @@ You'll need these credentials to generate a refresh token for Spotify.
 Spotify's access token expires every hour, so you will need a refresh token to obtain a new one automatically. To get your refresh token, refer to the following articles for a detailed guide:
 
 - [How to create a Spotify refresh token](https://benwiz.com/blog/create-spotify-refresh-token/)
-- [Connecting your React Vite.js app to Spotify's API](https://reine.hashnode.dev/how-to-connect-your-react-vitejs-app-to-spotifys-ap)
+- [Connecting your React Vite.js app to Spotify's API](https://reine.hashnode.dev/how-to-connect-your-react-vitejs-app-to-spotifys-api)
 
 Make sure to include the following scopes: "user-read-currently-playing" and "user-read-recently-played" when setting up the authorization process.
 

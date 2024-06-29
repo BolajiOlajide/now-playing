@@ -46,7 +46,7 @@ export class NowPlaying {
 
       // We only support in memory storage for now, if there's a need we can
       // support more storage mechanism.
-      this.storer = this.getStorer()
+      this.storer = args.storer || this.getStorer()
       this.streamer = this.getStreamer()
     } catch (err: unknown) {
       if (err instanceof ZodError) {

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { IStorer } from './storage'
 
 export enum Providers {
   SPOTIFY = 'SPOTIFY',
@@ -10,6 +11,20 @@ export const providerSchema = z.nativeEnum(Providers)
 export const BaseNowPlayingArgsSchema = z.object({
   useCache: z.boolean().optional(),
   cacheDuration: z.number().optional(),
+  storer: z.custom<IStorer>((data: unknown): data is IStorer => {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      typeof (data as IStorer).set === 'function' &&
+      typeof (data as IStorer).get === 'function' &&
+      typeof (data as IStorer).delete === 'function' &&
+      typeof (data as IStorer).has === 'function' &&
+      typeof (data as IStorer).clear === 'function' &&
+      typeof (data as IStorer).pruneExpiredEntries === 'function'
+    );
+  }, {
+    message: "Object does not implement IStorer interface"
+  }).optional()
 })
 export type BaseNowPlayingArgs = z.infer<typeof BaseNowPlayingArgsSchema>
 

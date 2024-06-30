@@ -20,22 +20,37 @@ yarn add @BolajiOlajide/now-playing
 ## Usage
 
 ```ts
-import { NowPlaying, Providers } from '@BolajiOlajide/now-playing'
+import { NowPlaying, Providers, type IStorer } from '@BolajiOlajide/now-playing'
+
+let myCustomStorer: IStorer
 
 const np = new NowPlaying(Providers.SPOTIFY, {
-  useCache: false, // default is true
-  cacheDuration: 30000, // in milliseconds
+  useCache: false, // (optional) default is true
+  cacheDuration: 30000, // (optional) in milliseconds
   streamerArgs: {
     clientId: 'foo',
     clientSecret: 'bar',
     refreshToken: 'baz',
   },
+  storer: myCustomStorer, // (optional) custom storage implementation
 })
 ```
 
 ### Storage
 
-Data is stored in memory. This is to reduce overhead. We plan to expose the `IStorer` interface later to allow you to use your own storage mechanism.
+We default to inmemory storage for saving information gotten via the API, (e.g Access tokens, Song data e.t.c).
+However you can pass in your own custom storage object, provided it satisfies the `IStorer` interface.
+
+```ts
+interface IStorer {
+  set<T>(key: string, value: T, duration: number): void
+  get<T>(key: string): T | undefined
+  delete(key: string): boolean
+  has(key: string): boolean
+  clear(): void
+  pruneExpiredEntries(): void
+}
+```
 
 ### Providers
 

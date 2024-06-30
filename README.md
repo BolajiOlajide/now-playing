@@ -32,7 +32,7 @@ const np = new NowPlaying(Providers.SPOTIFY, {
     clientSecret: 'bar',
     refreshToken: 'baz',
   },
-  storer: myCustomStorer // (optional) custom storage implementation
+  storer: myCustomStorer, // (optional) custom storage implementation
 })
 ```
 

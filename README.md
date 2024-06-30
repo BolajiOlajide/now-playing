@@ -20,7 +20,9 @@ yarn add @BolajiOlajide/now-playing
 ## Usage
 
 ```ts
-import { NowPlaying, Providers } from '@BolajiOlajide/now-playing'
+import { NowPlaying, Providers, type IStorer } from '@BolajiOlajide/now-playing'
+
+let myCustomStorer: IStorer
 
 const np = new NowPlaying(Providers.SPOTIFY, {
   useCache: false, // (optional) default is true
@@ -30,7 +32,7 @@ const np = new NowPlaying(Providers.SPOTIFY, {
     clientSecret: 'bar',
     refreshToken: 'baz',
   },
-  storer: // (optional) custom
+  storer: myCustomStorer // (optional) custom storage implementation
 })
 ```
 

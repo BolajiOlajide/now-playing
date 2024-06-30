@@ -11,6 +11,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # only want to run this job on the repo and not on forks.
+    if: github.repository_owner == 'BolajiOlajide'
+
     steps:
       - uses: actions/checkout@v4
 

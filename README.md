@@ -3,6 +3,8 @@
 Collaborative effort with [@lilpolymath](https://github.com/lilpolymath) to create a library that can be used to display
 the currently playing song from a user's streaming platform.
 
+[Read about the inspiration](https://favourcodes.com/writings/portfolio-to-package-building-now-playing).
+
 This library is built to be generic to work with multiple providers and storage mechanisms.
 
 ## Installation

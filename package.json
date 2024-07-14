@@ -7,7 +7,7 @@
   "types": "dist/now-playing.d.ts",
   "type": "module",
   "scripts": {
-    "build": "npx rimraf dist && rollup --config",
+    "build": "npx rimraf dist && vite build",
     "test": "vitest",
     "format": "prettier . --write"
   },
@@ -28,14 +28,14 @@
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "11.1.6",
-    "@types/node": "20.14.9",
+    "@types/node": "18.19.39",
     "@types/node-fetch": "2.6.11",
     "msw": "2.3.1",
     "prettier": "3.3.2",
-    "rollup": "4.18.0",
-    "rollup-plugin-dts": "6.1.1",
     "tslib": "2.6.3",
     "typescript": "5.4.5",
+    "vite": "^5.3.3",
+    "vite-plugin-dts": "^3.9.1",
     "vitest": "1.6.0"
   },
   "engines": {

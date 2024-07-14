@@ -1,7 +1,8 @@
 {
   "name": "@bolajiolajide/now-playing",
-  "version": "0.0.16",
-  "description": "",
+  "version": "1.0.0",
+  "description": "A simple package to get the current playing song from your user streaming platform",
+  "homepage": "https://github.com/bolajiolajide/now-playing",
   "main": "dist/now-playing.mjs",
   "module": "dist/now-playing.mjs",
   "types": "dist/now-playing.d.ts",
@@ -19,7 +20,7 @@
     "dist/now-playing.mjs",
     "dist/now-playing.d.ts"
   ],
-  "keywords": [],
+  "keywords": ["spotify", "now-playing", "in-memory"],
   "author": "",
   "license": "MIT",
   "dependencies": {

@@ -10,9 +10,9 @@
   "bugs": {
     "url": "https://github.com/bolajiolajide/now-playing/issues"
   },
-  "main": "dist/now-playing.mjs",
-  "module": "dist/now-playing.mjs",
-  "types": "dist/now-playing.d.ts",
+  "main": "./dist/now-playing.umd.cjs",
+  "module": "./dist/now-playing.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
     "build": "npx rimraf dist && vite build",
@@ -20,12 +20,14 @@
     "format": "prettier . --write"
   },
   "exports": {
-    "types": "./dist/now-playing.d.ts",
-    "default": "./dist/now-playing.mjs"
+    ".": {
+      "require": "./dist/now-playing.umd.cjs",
+      "import": "./dist/now-playing.js",
+      "types": "./dist/index.d.ts"
+    }
   },
   "files": [
-    "dist/now-playing.mjs",
-    "dist/now-playing.d.ts"
+    "dist"
   ],
   "keywords": [
     "spotify",

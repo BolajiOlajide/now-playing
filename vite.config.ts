@@ -14,8 +14,6 @@ export default defineConfig({
     lib: {
       entry: './src/index.ts',
       name: 'NowPlaying',
-      formats: ['es', 'umd'],
-      fileName: (format) => `now-playing.${format === 'es' ? 'mjs' : 'js'}`,
     },
     rollupOptions: {
       external: ['zod', 'node-fetch'],

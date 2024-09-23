@@ -11,7 +11,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "lib": ["es2020", "dom"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "emitDeclarationOnly": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "__tests__", "src/examples/**/*"]

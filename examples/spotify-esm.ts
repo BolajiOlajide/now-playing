@@ -8,4 +8,4 @@ const np = new NowPlaying(Providers.SPOTIFY, {
   },
 })
 
-console.log('Hello World', np)
+console.log('Hello World from ESM', np)

@@ -4,13 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "ex:spotify": "ts-node examples/spotify.ts"
+    "spotify:cjs": "ts-node ./spotify-cjs.cjs",
+    "spotify:esm": "node --loader ts-node/esm ./spotify-esm.ts"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@BolajiOlajide/now-playing": "file:..",
-    "ts-node": "^10.9.2"
+    "@BolajiOlajide/now-playing": "file:.."
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
   }
 }

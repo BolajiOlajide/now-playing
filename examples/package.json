@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "spotify:cjs": "ts-node ./spotify-cjs.cjs",
-    "spotify:esm": "node --loader ts-node/esm ./spotify-esm.ts"
+    "spotify": "node --loader ts-node/esm ./spotify.ts"
   },
   "type": "module",
   "keywords": [],
